@@ -9,47 +9,52 @@
   body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; touch-action: none; }
   #c { display: block; width: 100vw; height: 100vh; }
 
-  /* ── HUD ── */
-  #hud {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    pointer-events: none; z-index: 10;
-  }
+  #hud { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
 
   #telemetry {
     position: absolute; top: 12px; left: 12px;
-    background: rgba(0,20,40,0.75);
-    border: 1px solid rgba(0,200,255,0.35);
-    border-radius: 8px; padding: 10px 14px;
-    color: #0cf; font-size: 11px; line-height: 1.7;
-    min-width: 170px;
-    backdrop-filter: blur(4px);
+    background: rgba(0,20,40,0.78); border: 1px solid rgba(0,200,255,0.35);
+    border-radius: 8px; padding: 10px 14px; color: #0cf; font-size: 11px;
+    line-height: 1.7; min-width: 174px; backdrop-filter: blur(4px);
   }
   #telemetry .label { color: rgba(0,200,255,0.55); font-size: 9px; text-transform: uppercase; letter-spacing: 1px; }
-  #telemetry .val { color: #fff; font-size: 13px; font-weight: bold; }
+  #telemetry .val   { color: #fff; font-size: 13px; font-weight: bold; }
   #telemetry .bar-wrap { width: 100%; background: rgba(255,255,255,0.1); border-radius: 3px; height: 4px; margin: 2px 0 6px; }
-  #telemetry .bar { height: 4px; border-radius: 3px; transition: width 0.3s; }
-  #fuel-bar { background: linear-gradient(90deg,#f60,#ff0); }
+  #telemetry .bar   { height: 4px; border-radius: 3px; transition: width 0.25s; }
+  #fuel-bar     { background: linear-gradient(90deg,#f60,#ff0); }
   #throttle-bar { background: linear-gradient(90deg,#0af,#0ff); }
+
+  #ap-badge {
+    display: inline-block; font-size: 9px; font-weight: bold; letter-spacing: 1px;
+    padding: 2px 7px; border-radius: 4px; margin-top: 4px;
+    border: 1px solid; transition: all 0.3s;
+  }
+  #ap-badge.auto   { color: #0f0; border-color: #0f0; background: rgba(0,255,0,0.1); }
+  #ap-badge.manual { color: #f80; border-color: #f80; background: rgba(255,130,0,0.1); }
 
   #phase-banner {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
     color: #fff; font-size: clamp(18px,5vw,32px); font-weight: bold;
     text-align: center; text-shadow: 0 0 30px #0cf, 0 0 60px #0af;
-    letter-spacing: 3px; text-transform: uppercase;
-    opacity: 0; transition: opacity 0.5s;
+    letter-spacing: 3px; text-transform: uppercase; opacity: 0; transition: opacity 0.5s;
+    pointer-events: none;
+  }
+
+  #warp-badge {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, 40px);
+    color: #ff0; font-size: 13px; font-weight: bold; letter-spacing: 2px;
+    text-shadow: 0 0 10px #f80; opacity: 0; transition: opacity 0.5s;
     pointer-events: none;
   }
 
   #mission-status {
     position: absolute; top: 12px; right: 12px;
-    background: rgba(0,20,40,0.75);
-    border: 1px solid rgba(0,200,255,0.35);
-    border-radius: 8px; padding: 10px 14px;
-    color: #0cf; font-size: 11px; text-align: right;
-    min-width: 160px; line-height: 1.7;
-    backdrop-filter: blur(4px);
+    background: rgba(0,20,40,0.78); border: 1px solid rgba(0,200,255,0.35);
+    border-radius: 8px; padding: 10px 14px; color: #0cf; font-size: 11px;
+    text-align: right; min-width: 160px; line-height: 1.7; backdrop-filter: blur(4px);
   }
   #mission-status .phase-name { color: #ff0; font-size: 12px; font-weight: bold; }
+  #ap-action { color: #0f8; font-size: 10px; font-style: italic; min-height: 15px; }
 
   /* ── Controls ── */
   #controls {
@@ -57,7 +62,6 @@
     display: flex; justify-content: space-between; align-items: flex-end;
     padding: 16px; z-index: 20; pointer-events: none;
   }
-
   .ctrl-group { display: flex; flex-direction: column; gap: 8px; pointer-events: all; }
   .ctrl-group.right { align-items: flex-end; }
 
@@ -68,37 +72,27 @@
     color: #fff; font-size: 22px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     user-select: none; -webkit-user-select: none;
-    transition: background 0.1s, transform 0.1s;
-    touch-action: manipulation;
+    transition: background 0.1s, transform 0.1s; touch-action: manipulation;
   }
-  .btn:active, .btn.active {
-    background: rgba(0,150,255,0.5);
-    transform: scale(0.92);
-    border-color: #0cf;
-  }
-  #btn-thrust {
-    width: 80px; height: 80px; font-size: 28px;
-    background: rgba(255,80,0,0.3); border-color: rgba(255,120,0,0.6);
-  }
+  .btn:active, .btn.active { background: rgba(0,150,255,0.5); transform: scale(0.92); border-color: #0cf; }
+  #btn-thrust { width: 80px; height: 80px; font-size: 28px; background: rgba(255,80,0,0.3); border-color: rgba(255,120,0,0.6); }
   #btn-thrust.active { background: rgba(255,120,0,0.7); }
-
   .rotate-pad { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
   .rotate-pad .btn { width: 52px; height: 52px; font-size: 18px; }
 
-  /* ── Intro / Win screens ── */
+  /* ── Overlays ── */
   #overlay {
     position: fixed; inset: 0; background: rgba(0,5,15,0.92);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     z-index: 100; color: #fff; text-align: center; padding: 24px;
   }
   #overlay h1 { font-size: clamp(24px,8vw,52px); color: #0cf; text-shadow: 0 0 30px #0af; letter-spacing: 4px; margin-bottom: 8px; }
-  #overlay .sub { color: #adf; font-size: clamp(12px,3vw,16px); margin-bottom: 24px; line-height: 1.6; max-width: 500px; }
+  #overlay .sub { color: #adf; font-size: clamp(12px,3vw,16px); margin-bottom: 20px; line-height: 1.6; max-width: 500px; }
   #overlay .instructions { font-size: clamp(10px,2.5vw,13px); color: rgba(180,220,255,0.7); line-height: 2; margin-bottom: 28px; }
   #start-btn {
     padding: 14px 40px; font-size: 18px; font-family: inherit;
     background: rgba(0,120,255,0.3); border: 2px solid #0af;
     color: #0ff; border-radius: 8px; cursor: pointer; letter-spacing: 2px;
-    transition: background 0.2s;
   }
   #start-btn:hover { background: rgba(0,180,255,0.4); }
 
@@ -109,23 +103,12 @@
   }
   #win-overlay h1 { font-size: clamp(26px,8vw,56px); color: #ff0; text-shadow: 0 0 40px #f80; letter-spacing: 4px; }
   #win-overlay p { color: #adf; font-size: 16px; margin: 16px 0 28px; }
-  #restart-btn {
-    padding: 12px 36px; font-size: 16px; font-family: inherit;
-    background: rgba(255,140,0,0.2); border: 2px solid #f80;
-    color: #ff0; border-radius: 8px; cursor: pointer; letter-spacing: 2px;
-  }
-  #restart-btn:hover { background: rgba(255,140,0,0.4); }
+  #restart-btn { padding: 12px 36px; font-size: 16px; font-family: inherit; background: rgba(255,140,0,0.2); border: 2px solid #f80; color: #ff0; border-radius: 8px; cursor: pointer; letter-spacing: 2px; }
 
-  /* ── Crosshair ── */
-  #crosshair {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-    width: 30px; height: 30px; opacity: 0.5; pointer-events: none;
-  }
-  #crosshair::before, #crosshair::after {
-    content: ''; position: absolute; background: rgba(0,200,255,0.7);
-  }
-  #crosshair::before { width: 1px; height: 100%; left: 50%; top: 0; }
-  #crosshair::after  { height: 1px; width: 100%; top: 50%; left: 0; }
+  #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 30px; height: 30px; opacity: 0.4; pointer-events: none; }
+  #crosshair::before, #crosshair::after { content:''; position:absolute; background:rgba(0,200,255,0.7); }
+  #crosshair::before { width:1px; height:100%; left:50%; top:0; }
+  #crosshair::after  { height:1px; width:100%; top:50%; left:0; }
 </style>
 </head>
 <body>
@@ -144,9 +127,11 @@
     <div class="label">Throttle</div>
     <div class="bar-wrap"><div class="bar" id="throttle-bar" style="width:0%"></div></div>
     <div class="label">G-Force</div>
-    <div class="val" id="t-gforce">0.00 g</div>
+    <div class="val" id="t-gforce">1.00 g</div>
     <div class="label">Mission Time</div>
     <div class="val" id="t-time">T+00:00</div>
+    <br>
+    <div id="ap-badge" class="auto">● AUTOPILOT</div>
   </div>
 
   <div id="mission-status">
@@ -160,9 +145,12 @@
     <div class="val" id="t-apo">0 km</div>
     <div class="label">Periapsis</div>
     <div class="val" id="t-peri">0 km</div>
+    <br>
+    <div id="ap-action">Awaiting launch…</div>
   </div>
 
   <div id="phase-banner"></div>
+  <div id="warp-badge"></div>
   <div id="crosshair"></div>
 </div>
 
@@ -186,81 +174,73 @@
   </div>
 
   <div class="ctrl-group right">
-    <button class="btn" id="btn-cam"   title="Camera">📷</button>
-    <button class="btn" id="btn-sas"   title="SAS (auto-stabilize)">⚙</button>
-    <button class="btn" id="btn-rcs"   title="Fine RCS thrust">⬆</button>
+    <button class="btn" id="btn-cam"  title="Camera">📷</button>
+    <button class="btn" id="btn-ap"   title="Toggle Autopilot" style="font-size:14px;border-color:#0f0">AUTO</button>
+    <button class="btn" id="btn-warp" title="Time Warp" style="font-size:14px">WARP</button>
   </div>
 </div>
 
-<!-- Intro overlay -->
+<!-- Intro -->
 <div id="overlay">
   <h1>LUNAR SHUTTLE</h1>
-  <div class="sub">A realistic space mission simulator.<br>Launch from Earth. Reach the Moon.</div>
+  <div class="sub">Autopilot flies the full mission automatically.<br>Take control any time — your inputs always override.</div>
   <div class="instructions">
-    🔥 THRUST — Hold Space / Fire button<br>
-    ◀▶ Rotate — Arrow keys / Pad<br>
+    🤖 AUTOPILOT handles launch → orbit → TLI → Moon landing<br>
+    🔥 THRUST — Hold Space or fire button to add manual thrust<br>
+    ◀▶▲▼ Rotate — Arrow keys / touch pad (always active)<br>
     ↺↻ Roll — Q / E keys<br>
-    ⚙ SAS — Auto-stabilize attitude<br>
-    📷 Camera — Cycle views<br>
-    <br>
-    <em>Follow mission phases. Manage your fuel!</em>
+    AUTO — Toggle autopilot on/off<br>
+    WARP — Speed up time during coast<br>
+    📷 — Cycle camera views
   </div>
   <button id="start-btn">INITIATE LAUNCH SEQUENCE</button>
 </div>
 
-<!-- Win overlay -->
+<!-- Win -->
 <div id="win-overlay">
   <h1>🌕 MOON LANDING!</h1>
-  <p id="win-stats">Mission accomplished. Eagle has landed.</p>
+  <p id="win-stats">Mission accomplished.</p>
   <button id="restart-btn">FLY AGAIN</button>
 </div>
 
 <script type="importmap">
 {
   "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
   }
 }
 </script>
-
 <script type="module">
 import * as THREE from 'three';
 
 // ═══════════════════════════════════════════════
-// CONSTANTS & CONFIG
+// CONSTANTS
 // ═══════════════════════════════════════════════
-const EARTH_RADIUS   = 6.371;   // scene units
-const MOON_RADIUS    = 1.737;
-const MOON_DISTANCE  = 384.4;   // scene units (1 unit = 1000 km)
-const G_EARTH        = 9.807;   // m/s²
-const G_MOON         = 1.625;
-const ATMO_HEIGHT    = 0.1;     // scene units above earth surface
-const FUEL_MAX       = 100;
-const THRUST_FORCE   = 18;      // m/s² at full throttle
-const RCS_TORQUE     = 0.8;
+const EARTH_RADIUS  = 6.371;
+const MOON_RADIUS   = 1.737;
+const MOON_DISTANCE = 384.4;
+const ATMO_HEIGHT   = 0.12;    // scene units
 
 const PHASE = {
-  PRELAUNCH:  'PRE-LAUNCH',
-  LAUNCH:     'LAUNCH',
-  ASCENT:     'ASCENT',
-  ORBIT:      'ORBIT',
-  TLI:        'TRANS-LUNAR INJECTION',
-  COAST:      'COAST',
-  APPROACH:   'LUNAR APPROACH',
-  LANDING:    'LANDING',
-  LANDED:     'MISSION COMPLETE',
+  PRELAUNCH: 'PRE-LAUNCH',
+  LAUNCH:    'LAUNCH',
+  ASCENT:    'ASCENT',
+  ORBIT:     'ORBIT',
+  TLI:       'TRANS-LUNAR INJECTION',
+  COAST:     'COAST',
+  APPROACH:  'LUNAR APPROACH',
+  LANDING:   'LANDING',
+  LANDED:    'MISSION COMPLETE',
 };
 
 // ═══════════════════════════════════════════════
-// SCENE SETUP
+// RENDERER
 // ═══════════════════════════════════════════════
-const canvas  = document.getElementById('c');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+const canvas   = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.2;
 
@@ -270,81 +250,52 @@ const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerH
 // ═══════════════════════════════════════════════
 // PROCEDURAL TEXTURES
 // ═══════════════════════════════════════════════
-function makeCanvas(w, h) {
+function mkCanvas(w, h) {
   const c = document.createElement('canvas'); c.width = w; c.height = h;
   return { c, ctx: c.getContext('2d') };
 }
 
-function earthTexture() {
-  const { c, ctx } = makeCanvas(1024, 512);
-  // Deep ocean base
+function earthTex() {
+  const { c, ctx } = mkCanvas(1024, 512);
   const ocean = ctx.createLinearGradient(0,0,0,512);
-  ocean.addColorStop(0,   '#0a2a5e');
-  ocean.addColorStop(0.5, '#0d3d7a');
-  ocean.addColorStop(1,   '#061e4a');
+  ocean.addColorStop(0,'#0a2a5e'); ocean.addColorStop(0.5,'#0d3d7a'); ocean.addColorStop(1,'#061e4a');
   ctx.fillStyle = ocean; ctx.fillRect(0,0,1024,512);
-
-  // Continents — rough noise blobs
   ctx.fillStyle = '#2d6e3a';
-  const blobs = [
-    // N America
-    {x:200,y:160,rx:80,ry:70}, {x:230,y:220,rx:60,ry:50},
-    // S America
+  [
+    {x:200,y:160,rx:80,ry:70},{x:230,y:220,rx:60,ry:50},
     {x:270,y:320,rx:45,ry:80},
-    // Europe/Africa
-    {x:510,y:160,rx:45,ry:40}, {x:530,y:240,rx:40,ry:60}, {x:520,y:340,rx:50,ry:90},
-    // Asia
-    {x:650,y:140,rx:130,ry:70}, {x:720,y:220,rx:80,ry:55},
-    // Australia
+    {x:510,y:160,rx:45,ry:40},{x:530,y:240,rx:40,ry:60},{x:520,y:340,rx:50,ry:90},
+    {x:650,y:140,rx:130,ry:70},{x:720,y:220,rx:80,ry:55},
     {x:780,y:370,rx:55,ry:40},
-  ];
-  blobs.forEach(b => {
-    ctx.beginPath(); ctx.ellipse(b.x,b.y,b.rx,b.ry,0,0,Math.PI*2); ctx.fill();
-  });
-
-  // Ice caps
-  ctx.fillStyle = '#deeeff';
-  ctx.fillRect(0,0,1024,30); ctx.fillRect(0,482,1024,30);
-
-  // Cloud wisps
-  ctx.globalAlpha = 0.55;
-  ctx.fillStyle = '#ffffff';
-  [[150,100,200,20],[350,80,160,15],[600,130,220,18],[800,200,150,16],
-   [100,300,180,14],[450,350,200,20],[700,320,160,15]].forEach(([x,y,w,h]) => {
+  ].forEach(b => { ctx.beginPath(); ctx.ellipse(b.x,b.y,b.rx,b.ry,0,0,Math.PI*2); ctx.fill(); });
+  ctx.fillStyle='#deeeff'; ctx.fillRect(0,0,1024,28); ctx.fillRect(0,484,1024,28);
+  ctx.globalAlpha=0.5; ctx.fillStyle='#fff';
+  [[150,100,200,18],[350,80,160,14],[600,130,220,16],[800,200,150,15],
+   [100,300,180,13],[450,350,200,18],[700,320,160,14]].forEach(([x,y,w,h])=>{
     ctx.beginPath(); ctx.ellipse(x,y,w,h,0,0,Math.PI*2); ctx.fill();
   });
-  ctx.globalAlpha = 1;
-
-  const t = new THREE.CanvasTexture(c); return t;
+  ctx.globalAlpha=1;
+  return new THREE.CanvasTexture(c);
 }
 
-function moonTexture() {
-  const { c, ctx } = makeCanvas(512, 256);
-  // Grey lunar surface
-  const g = ctx.createRadialGradient(256,128,0,256,128,260);
+function moonTex() {
+  const { c, ctx } = mkCanvas(512, 256);
+  const g = ctx.createLinearGradient(0,0,512,256);
   g.addColorStop(0,'#c8c0b0'); g.addColorStop(1,'#7a7065');
-  ctx.fillStyle = g; ctx.fillRect(0,0,512,256);
-
-  // Craters
-  ctx.strokeStyle = 'rgba(60,55,50,0.6)';
-  ctx.fillStyle   = 'rgba(50,45,40,0.4)';
-  [[120,100,30],[250,80,20],[380,140,25],[80,180,18],[300,190,35],[180,50,15],[420,60,22],[60,60,12]].forEach(([x,y,r]) => {
-    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-    ctx.fill(); ctx.lineWidth=1.5; ctx.stroke();
-    // rim highlight
-    ctx.strokeStyle='rgba(200,190,180,0.3)';
+  ctx.fillStyle=g; ctx.fillRect(0,0,512,256);
+  [[120,100,30],[250,80,20],[380,140,25],[80,180,18],[300,190,35],[180,50,15],[420,60,22]].forEach(([x,y,r])=>{
+    ctx.fillStyle='rgba(50,45,40,0.45)'; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='rgba(200,190,180,0.35)'; ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.arc(x-r*0.1,y-r*0.1,r,0,Math.PI*2); ctx.stroke();
-    ctx.strokeStyle='rgba(60,55,50,0.6)';
   });
-  const t = new THREE.CanvasTexture(c); return t;
+  return new THREE.CanvasTexture(c);
 }
 
-function shuttleEngineTex() {
-  const { c, ctx } = makeCanvas(64,64);
-  const g = ctx.createRadialGradient(32,32,2,32,32,32);
-  g.addColorStop(0,'#ffffff'); g.addColorStop(0.3,'#ffaa00');
-  g.addColorStop(0.7,'#ff4400'); g.addColorStop(1,'rgba(255,0,0,0)');
-  ctx.fillStyle=g; ctx.fillRect(0,0,64,64);
+function glowSprite() {
+  const { c, ctx } = mkCanvas(32,32);
+  const g = ctx.createRadialGradient(16,16,0,16,16,16);
+  g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(0.3,'rgba(255,160,0,0.8)'); g.addColorStop(1,'rgba(255,0,0,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,32,32);
   return new THREE.CanvasTexture(c);
 }
 
@@ -352,260 +303,145 @@ function shuttleEngineTex() {
 // STARFIELD
 // ═══════════════════════════════════════════════
 function buildStarfield() {
-  const geo = new THREE.BufferGeometry();
-  const N = 8000;
-  const pos = new Float32Array(N*3);
-  const col = new Float32Array(N*3);
-  for (let i=0;i<N;i++) {
-    const theta = Math.random()*Math.PI*2;
-    const phi   = Math.acos(2*Math.random()-1);
-    const r = 800 + Math.random()*100;
-    pos[i*3]   = r*Math.sin(phi)*Math.cos(theta);
-    pos[i*3+1] = r*Math.sin(phi)*Math.sin(theta);
-    pos[i*3+2] = r*Math.cos(phi);
-    const brightness = 0.6 + Math.random()*0.4;
-    const hue = Math.random();
-    // mostly white, some blue/orange tints
-    if (hue < 0.15) { col[i*3]=0.7; col[i*3+1]=0.8; col[i*3+2]=1.0*brightness; }
-    else if (hue < 0.25) { col[i*3]=1.0*brightness; col[i*3+1]=0.85*brightness; col[i*3+2]=0.6; }
-    else { col[i*3]=brightness; col[i*3+1]=brightness; col[i*3+2]=brightness; }
+  const N=8000, pos=new Float32Array(N*3), col=new Float32Array(N*3);
+  for(let i=0;i<N;i++){
+    const t=Math.random()*Math.PI*2, p=Math.acos(2*Math.random()-1), r=800+Math.random()*100;
+    pos[i*3]=r*Math.sin(p)*Math.cos(t); pos[i*3+1]=r*Math.sin(p)*Math.sin(t); pos[i*3+2]=r*Math.cos(p);
+    const b=0.6+Math.random()*0.4, h=Math.random();
+    if(h<0.15){col[i*3]=0.7;col[i*3+1]=0.8;col[i*3+2]=b;}
+    else if(h<0.25){col[i*3]=b;col[i*3+1]=0.85*b;col[i*3+2]=0.6;}
+    else{col[i*3]=b;col[i*3+1]=b;col[i*3+2]=b;}
   }
-  geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-  geo.setAttribute('color',    new THREE.BufferAttribute(col,3));
-  const mat = new THREE.PointsMaterial({ size:0.8, vertexColors:true, sizeAttenuation:false });
-  return new THREE.Points(geo, mat);
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+  return new THREE.Points(geo,new THREE.PointsMaterial({size:0.8,vertexColors:true,sizeAttenuation:false}));
 }
 
 // ═══════════════════════════════════════════════
 // EARTH
 // ═══════════════════════════════════════════════
 function buildEarth() {
-  const group = new THREE.Group();
-
-  // Main sphere
-  const geo = new THREE.SphereGeometry(EARTH_RADIUS, 64, 32);
-  const mat = new THREE.MeshPhongMaterial({
-    map: earthTexture(),
-    specular: new THREE.Color(0x224466),
-    shininess: 40,
+  const g=new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(EARTH_RADIUS,64,32), new THREE.MeshPhongMaterial({map:earthTex(),specular:new THREE.Color(0x224466),shininess:40})));
+  [{r:EARTH_RADIUS+0.04,c:0x4488ff,o:0.18},{r:EARTH_RADIUS+0.12,c:0x2255cc,o:0.09},{r:EARTH_RADIUS+0.24,c:0x1133aa,o:0.04}].forEach(({r,c,o})=>{
+    g.add(new THREE.Mesh(new THREE.SphereGeometry(r,48,24),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,side:THREE.BackSide,depthWrite:false})));
   });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.receiveShadow = true;
-  group.add(mesh);
-
-  // Atmosphere glow — multiple shells
-  [
-    { r: EARTH_RADIUS+0.04, color: 0x4488ff, opacity: 0.18 },
-    { r: EARTH_RADIUS+0.10, color: 0x2255cc, opacity: 0.10 },
-    { r: EARTH_RADIUS+0.20, color: 0x1133aa, opacity: 0.05 },
-  ].forEach(({ r, color, opacity }) => {
-    const ag = new THREE.SphereGeometry(r, 48, 24);
-    const am = new THREE.MeshBasicMaterial({ color, transparent:true, opacity, side: THREE.BackSide, depthWrite:false });
-    group.add(new THREE.Mesh(ag, am));
-  });
-
-  // Ocean specular
-  const sg = new THREE.SphereGeometry(EARTH_RADIUS+0.001, 48, 24);
-  const sm = new THREE.MeshPhongMaterial({ color:0x0044aa, specular:0x88ccff, shininess:80, transparent:true, opacity:0.25, depthWrite:false });
-  group.add(new THREE.Mesh(sg,sm));
-
-  return group;
+  return g;
 }
 
 // ═══════════════════════════════════════════════
 // MOON
 // ═══════════════════════════════════════════════
 function buildMoon() {
-  const group = new THREE.Group();
-  const geo = new THREE.SphereGeometry(MOON_RADIUS, 48, 24);
-  const mat = new THREE.MeshPhongMaterial({
-    map: moonTexture(),
-    specular: new THREE.Color(0x222222),
-    shininess: 5,
-    bumpScale: 0.02,
-  });
-  const mesh = new THREE.Mesh(geo, mat);
-  group.add(mesh);
-
-  // Faint glow
-  const gg = new THREE.SphereGeometry(MOON_RADIUS+0.04, 32, 16);
-  const gm = new THREE.MeshBasicMaterial({ color:0xaaaacc, transparent:true, opacity:0.04, side:THREE.BackSide, depthWrite:false });
-  group.add(new THREE.Mesh(gg,gm));
-
-  group.position.set(MOON_DISTANCE, 0, 0);
-  return group;
+  const g=new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(MOON_RADIUS,48,24),new THREE.MeshPhongMaterial({map:moonTex(),specular:new THREE.Color(0x222222),shininess:5})));
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(MOON_RADIUS+0.05,32,16),new THREE.MeshBasicMaterial({color:0xaaaacc,transparent:true,opacity:0.03,side:THREE.BackSide,depthWrite:false})));
+  g.position.set(MOON_DISTANCE,0,0);
+  return g;
 }
 
 // ═══════════════════════════════════════════════
-// SPACE SHUTTLE MODEL (procedural geometry)
+// SHUTTLE (procedural geometry)
 // ═══════════════════════════════════════════════
 function buildShuttle() {
-  const group = new THREE.Group();
+  const g=new THREE.Group();
+  const W=new THREE.MeshPhongMaterial({color:0xeeeeee,specular:0x333333,shininess:40});
+  const D=new THREE.MeshPhongMaterial({color:0x222222});
+  const O=new THREE.MeshPhongMaterial({color:0xcc5500});
 
-  const white = new THREE.MeshPhongMaterial({ color:0xeeeeee, specular:0x333333, shininess:40 });
-  const dark  = new THREE.MeshPhongMaterial({ color:0x222222 });
-  const orange= new THREE.MeshPhongMaterial({ color:0xcc5500, specular:0x111111 });
-  const black = new THREE.MeshPhongMaterial({ color:0x111111 });
-  const gold  = new THREE.MeshPhongMaterial({ color:0xddaa00, specular:0x555555, shininess:80 });
+  // Fuselage — nose at -Z, tail at +Z
+  const fuse=new THREE.Mesh(new THREE.CylinderGeometry(0.018,0.022,0.18,12),W);
+  fuse.rotation.x=Math.PI/2; g.add(fuse);
 
-  // Orbiter fuselage
-  const fGeo = new THREE.CylinderGeometry(0.018,0.022,0.18,12);
-  const fuselage = new THREE.Mesh(fGeo, white);
-  fuselage.rotation.x = Math.PI/2;
-  group.add(fuselage);
+  const nose=new THREE.Mesh(new THREE.ConeGeometry(0.018,0.055,12),W);
+  nose.rotation.x=-Math.PI/2; nose.position.z=-0.12; g.add(nose);
 
-  // Nose cone
-  const nGeo = new THREE.ConeGeometry(0.018,0.055,12);
-  const nose = new THREE.Mesh(nGeo, white);
-  nose.rotation.x = -Math.PI/2; nose.position.z = -0.12;
-  group.add(nose);
+  const tail=new THREE.Mesh(new THREE.ConeGeometry(0.022,0.04,12),W);
+  tail.rotation.x=Math.PI/2; tail.position.z=0.1; g.add(tail);
 
-  // Tail section
-  const tGeo = new THREE.ConeGeometry(0.022,0.04,12);
-  const tail = new THREE.Mesh(tGeo, white);
-  tail.rotation.x = Math.PI/2; tail.position.z = 0.1;
-  group.add(tail);
-
-  // Wings — flat triangular
-  [-1,1].forEach(side => {
-    const wShape = new THREE.Shape();
-    wShape.moveTo(0,0); wShape.lineTo(0.09,0.015*side); wShape.lineTo(0.07,-0.04*side); wShape.lineTo(0,0);
-    const wGeo = new THREE.ExtrudeGeometry(wShape, { depth:0.003, bevelEnabled:false });
-    const wing = new THREE.Mesh(wGeo, white);
-    wing.position.set(-0.01,0,0.03);
-    wing.rotation.x = Math.PI/2;
-    wing.scale.set(1,side,1);
-    group.add(wing);
+  // Wings
+  [-1,1].forEach(s=>{
+    const sh=new THREE.Shape();
+    sh.moveTo(0,0); sh.lineTo(0.09,0.015*s); sh.lineTo(0.07,-0.04*s); sh.lineTo(0,0);
+    const wm=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.003,bevelEnabled:false}),W);
+    wm.position.set(-0.01,0,0.03); wm.rotation.x=Math.PI/2; wm.scale.set(1,s,1); g.add(wm);
   });
 
-  // Vertical tail fin
-  const vShape = new THREE.Shape();
-  vShape.moveTo(0,0); vShape.lineTo(0.05,0.06); vShape.lineTo(0.05,0); vShape.lineTo(0,0);
-  const vGeo = new THREE.ExtrudeGeometry(vShape,{depth:0.003,bevelEnabled:false});
-  const vFin = new THREE.Mesh(vGeo, white);
-  vFin.position.set(0.02,0.002,0.02);
-  vFin.rotation.x = Math.PI/2; vFin.rotation.y = Math.PI/2;
-  group.add(vFin);
+  // Vertical fin
+  const vs=new THREE.Shape();
+  vs.moveTo(0,0); vs.lineTo(0.05,0.06); vs.lineTo(0.05,0); vs.lineTo(0,0);
+  const vf=new THREE.Mesh(new THREE.ExtrudeGeometry(vs,{depth:0.003,bevelEnabled:false}),W);
+  vf.position.set(0.02,0.002,0.02); vf.rotation.x=Math.PI/2; vf.rotation.y=Math.PI/2; g.add(vf);
 
   // External tank
-  const etGeo = new THREE.CylinderGeometry(0.030,0.028,0.20,12);
-  const et = new THREE.Mesh(etGeo, orange);
-  et.rotation.x = Math.PI/2; et.position.y = -0.042;
-  group.add(et);
+  const et=new THREE.Mesh(new THREE.CylinderGeometry(0.030,0.028,0.20,12),O);
+  et.rotation.x=Math.PI/2; et.position.y=-0.042; g.add(et);
+  const etn=new THREE.Mesh(new THREE.ConeGeometry(0.030,0.045,12),O);
+  etn.rotation.x=-Math.PI/2; etn.position.set(0,-0.042,-0.122); g.add(etn);
 
-  // ET nose
-  const etNGeo = new THREE.ConeGeometry(0.030,0.045,12);
-  const etN = new THREE.Mesh(etNGeo, orange);
-  etN.rotation.x = -Math.PI/2; etN.position.set(0,-0.042,-0.122);
-  group.add(etN);
-
-  // Solid rocket boosters
-  [-1,1].forEach(side => {
-    const srbGeo = new THREE.CylinderGeometry(0.015,0.014,0.19,8);
-    const srb = new THREE.Mesh(srbGeo, white);
-    srb.rotation.x = Math.PI/2; srb.position.set(0,-0.042-side*0.062,0);
-    group.add(srb);
-
-    const srbNGeo = new THREE.ConeGeometry(0.015,0.04,8);
-    const srbN = new THREE.Mesh(srbNGeo, white);
-    srbN.rotation.x = -Math.PI/2; srbN.position.set(0,-0.042-side*0.062,-0.114);
-    group.add(srbN);
-
-    // SRB nozzle
-    const nzGeo = new THREE.CylinderGeometry(0.010,0.016,0.018,8);
-    const nz = new THREE.Mesh(nzGeo, dark);
-    nz.rotation.x = Math.PI/2; nz.position.set(0,-0.042-side*0.062,0.108);
-    group.add(nz);
+  // SRBs
+  [-1,1].forEach(s=>{
+    const srb=new THREE.Mesh(new THREE.CylinderGeometry(0.015,0.014,0.19,8),W);
+    srb.rotation.x=Math.PI/2; srb.position.set(0,-0.042-s*0.062,0); g.add(srb);
+    const sn=new THREE.Mesh(new THREE.ConeGeometry(0.015,0.04,8),W);
+    sn.rotation.x=-Math.PI/2; sn.position.set(0,-0.042-s*0.062,-0.114); g.add(sn);
+    const nz=new THREE.Mesh(new THREE.CylinderGeometry(0.010,0.016,0.018,8),D);
+    nz.rotation.x=Math.PI/2; nz.position.set(0,-0.042-s*0.062,0.108); g.add(nz);
   });
 
-  // Main engine nozzles (3)
-  [[-0.015,0.01],[0,0.018],[0.015,0.01]].forEach(([y,z]) => {
-    const nzGeo = new THREE.CylinderGeometry(0.008,0.013,0.025,8);
-    const nz = new THREE.Mesh(nzGeo, dark);
-    nz.rotation.x = Math.PI/2; nz.position.set(0,y+0,0.097);
-    group.add(nz);
+  // Main engine nozzles
+  [[-0.015,0.01],[0,0.018],[0.015,0.01]].forEach(([y])=>{
+    const nz=new THREE.Mesh(new THREE.CylinderGeometry(0.008,0.013,0.025,8),D);
+    nz.rotation.x=Math.PI/2; nz.position.set(0,y,0.097); g.add(nz);
   });
 
   // Cockpit windows
-  [-0.007,0.007].forEach(x => {
-    const wGeo = new THREE.SphereGeometry(0.007,8,8);
-    const wMat = new THREE.MeshPhongMaterial({color:0x88ccff,transparent:true,opacity:0.7,emissive:0x224488,shininess:100});
-    const win = new THREE.Mesh(wGeo, wMat);
-    win.position.set(x,0.012,-0.10);
-    group.add(win);
+  [-0.007,0.007].forEach(x=>{
+    const wm=new THREE.Mesh(new THREE.SphereGeometry(0.007,8,8),
+      new THREE.MeshPhongMaterial({color:0x88ccff,transparent:true,opacity:0.7,emissive:0x224488,shininess:100}));
+    wm.position.set(x,0.012,-0.10); g.add(wm);
   });
 
-  // Scale the whole shuttle to look right in scene
-  group.scale.setScalar(0.15);
-
-  // Cast shadows
-  group.traverse(m => { if(m.isMesh) { m.castShadow=true; m.receiveShadow=true; } });
-
-  return group;
+  g.scale.setScalar(0.15);
+  g.traverse(m=>{ if(m.isMesh){m.castShadow=true;m.receiveShadow=true;} });
+  return g;
 }
 
 // ═══════════════════════════════════════════════
-// ENGINE PLUME (particle system)
+// ENGINE PLUME
 // ═══════════════════════════════════════════════
 function buildPlume() {
-  const N = 300;
-  const geo = new THREE.BufferGeometry();
-  const pos = new Float32Array(N*3);
-  const vel = new Float32Array(N*3); // stored in userData
-  const life = new Float32Array(N);
-  for (let i=0;i<N;i++) life[i]=Math.random();
-  geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-
-  const mat = new THREE.PointsMaterial({
-    size: 0.004, color:0xff8800, transparent:true, opacity:0.8,
-    blending: THREE.AdditiveBlending, depthWrite:false,
-    map: engineGlowSprite(),
-  });
-  const pts = new THREE.Points(geo,mat);
-  pts.userData = { vel, life };
+  const N=300, pos=new Float32Array(N*3), vel=new Float32Array(N*3), life=new Float32Array(N);
+  for(let i=0;i<N;i++) { life[i]=Math.random(); pos[i*3]=1e9; }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const mat=new THREE.PointsMaterial({size:0.004,color:0xff8800,transparent:true,opacity:0.8,blending:THREE.AdditiveBlending,depthWrite:false,map:glowSprite()});
+  const pts=new THREE.Points(geo,mat);
+  pts.userData={vel,life};
   return pts;
 }
 
-function engineGlowSprite() {
-  const { c, ctx } = makeCanvas(32,32);
-  const g = ctx.createRadialGradient(16,16,0,16,16,16);
-  g.addColorStop(0,'rgba(255,255,255,1)');
-  g.addColorStop(0.3,'rgba(255,160,0,0.8)');
-  g.addColorStop(1,'rgba(255,0,0,0)');
-  ctx.fillStyle=g; ctx.fillRect(0,0,32,32);
-  return new THREE.CanvasTexture(c);
-}
-
-// SRB separation sparks
 function buildSparks() {
-  const N = 150;
-  const geo = new THREE.BufferGeometry();
-  const pos = new Float32Array(N*3);
-  const vel = new Float32Array(N*3);
-  geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-  const mat = new THREE.PointsMaterial({ size:0.005, color:0xffff00, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false });
-  const pts = new THREE.Points(geo,mat);
-  pts.userData = { vel, life: new Float32Array(N), active:false };
+  const N=150, pos=new Float32Array(N*3), vel=new Float32Array(N*3);
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const mat=new THREE.PointsMaterial({size:0.005,color:0xffff00,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+  const pts=new THREE.Points(geo,mat);
+  pts.userData={vel,life:new Float32Array(N),active:false,timer:0};
   return pts;
 }
 
 // ═══════════════════════════════════════════════
 // LIGHTING
 // ═══════════════════════════════════════════════
-const sun = new THREE.DirectionalLight(0xfff8e0, 2.5);
-sun.position.set(-200, 50, 100);
-sun.castShadow = true;
-scene.add(sun);
-
-const ambient = new THREE.AmbientLight(0x111133, 0.4);
-scene.add(ambient);
-
-// Earth glow (fill light from earth side)
-const earthFill = new THREE.PointLight(0x2244aa, 0.8, 30);
-scene.add(earthFill);
+const sun=new THREE.DirectionalLight(0xfff8e0,2.5);
+sun.position.set(-200,50,100); sun.castShadow=true; scene.add(sun);
+scene.add(new THREE.AmbientLight(0x111133,0.4));
+const earthFill=new THREE.PointLight(0x2244aa,0.8,30); scene.add(earthFill);
 
 // ═══════════════════════════════════════════════
-// BUILD SCENE OBJECTS
+// BUILD SCENE
 // ═══════════════════════════════════════════════
 const stars   = buildStarfield(); scene.add(stars);
 const earth   = buildEarth();     scene.add(earth);
@@ -614,131 +450,174 @@ const shuttle = buildShuttle();   scene.add(shuttle);
 const plume   = buildPlume();     scene.add(plume);
 const sparks  = buildSparks();    scene.add(sparks);
 
-// Landing pad on moon
-const padGeo = new THREE.CylinderGeometry(0.08,0.08,0.005,16);
-const padMat = new THREE.MeshPhongMaterial({ color:0xffcc00, emissive:0x553300 });
-const landPad = new THREE.Mesh(padGeo, padMat);
-landPad.position.set(MOON_DISTANCE - MOON_RADIUS - 0.01, 0, 0);
+const padGeo=new THREE.CylinderGeometry(0.08,0.08,0.005,16);
+const padMat=new THREE.MeshPhongMaterial({color:0xffcc00,emissive:0x553300});
+const landPad=new THREE.Mesh(padGeo,padMat);
+landPad.position.set(MOON_DISTANCE-MOON_RADIUS-0.01,0,0);
 scene.add(landPad);
 
 // ═══════════════════════════════════════════════
 // GAME STATE
 // ═══════════════════════════════════════════════
-let state = {
-  started:  false,
-  phase:    PHASE.PRELAUNCH,
-  pos:      new THREE.Vector3(0, EARTH_RADIUS + 0.005, 0), // just above surface
-  vel:      new THREE.Vector3(0, 0, 0),
-  rot:      new THREE.Quaternion(),
-  fuel:     FUEL_MAX,
-  throttle: 0,
-  thrusting: false,
-  sasOn:    false,
-  missionTime: 0,
-  srbSep:   false,   // solid rocket boosters separated
-  cameraMode: 0,     // 0=chase, 1=cockpit, 2=orbital
-  gForce:   1.0,
-  prevVel:  new THREE.Vector3(),
-  phaseBannerTimer: 0,
-  warpFactor: 1,     // time warp (not exposed to user, auto in coast)
-};
+function freshState() {
+  const s = {
+    started: false, phase: PHASE.PRELAUNCH,
+    pos: new THREE.Vector3(0, EARTH_RADIUS+0.005, 0),
+    vel: new THREE.Vector3(0,0,0),
+    rot: new THREE.Quaternion(),
+    fuel: 100, throttle: 0,
+    thrusting: false,
+    missionTime: 0,
+    srbSep: false,
+    cameraMode: 0,
+    gForce: 1,
+    prevVel: new THREE.Vector3(),
+    phaseBannerTimer: 0,
+    warpFactor: 1,
+    manualWarp: false,
+    // Autopilot
+    autopilot: true,
+    apThrottle: 0,
+    apAction: '',
+  };
+  // Orient nose pointing away from Earth (+Y direction → nose is -Z local → rotate -Z to +Y)
+  s.rot.setFromUnitVectors(new THREE.Vector3(0,0,-1), new THREE.Vector3(0,1,0));
+  return s;
+}
+let state = freshState();
 
 // Keys
 const keys = {};
-window.addEventListener('keydown', e => { keys[e.key]=true; });
+window.addEventListener('keydown', e => { keys[e.key]=true; e.key===' '&&e.preventDefault(); });
 window.addEventListener('keyup',   e => { keys[e.key]=false; });
 
 // ═══════════════════════════════════════════════
-// TOUCH BUTTONS
+// AUTOPILOT
 // ═══════════════════════════════════════════════
-function setupBtn(id, keyName) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const on  = () => { keys[keyName]=true; el.classList.add('active'); };
-  const off = () => { keys[keyName]=false; el.classList.remove('active'); };
-  el.addEventListener('pointerdown', on);
-  el.addEventListener('pointerup',   off);
-  el.addEventListener('pointerleave',off);
+
+// Rotate shuttle nose toward targetDir at rate rad/s
+function rotateToward(targetDir, dt, rate=1.5) {
+  const fwd = new THREE.Vector3(0,0,-1).applyQuaternion(state.rot);
+  const dot  = Math.max(-1, Math.min(1, fwd.dot(targetDir)));
+  if (dot >= 0.9999) return;
+  const cross = fwd.clone().cross(targetDir);
+  if (cross.lengthSq() < 1e-10) return;
+  const axis  = cross.normalize();
+  const angle = Math.acos(dot);
+  const apply = Math.min(angle, rate * dt);
+  state.rot.premultiply(new THREE.Quaternion().setFromAxisAngle(axis, apply));
+  state.rot.normalize();
 }
 
-setupBtn('btn-thrust',     ' ');
-setupBtn('btn-pitch-up',   'ArrowUp');
-setupBtn('btn-pitch-down', 'ArrowDown');
-setupBtn('btn-yaw-left',   'ArrowLeft');
-setupBtn('btn-yaw-right',  'ArrowRight');
-setupBtn('btn-roll-left',  'q');
-setupBtn('btn-roll-right', 'e');
-setupBtn('btn-rcs',        'r');
+function updateAutopilot(dt) {
+  if (!state.autopilot || !state.started || state.phase === PHASE.PRELAUNCH || state.phase === PHASE.LANDED) {
+    state.apThrottle = 0; state.apAction = ''; return;
+  }
 
-document.getElementById('btn-cam').addEventListener('click', () => {
-  state.cameraMode = (state.cameraMode + 1) % 3;
-});
-document.getElementById('btn-sas').addEventListener('click', () => {
-  state.sasOn = !state.sasOn;
-  document.getElementById('btn-sas').style.borderColor = state.sasOn ? '#0f0' : '';
-});
+  const distEarth = state.pos.length();
+  const altitude  = distEarth - EARTH_RADIUS;
+  const toMoonVec = moon.position.clone().sub(state.pos);
+  const distMoon  = toMoonVec.length();
+  const fromEarth = state.pos.clone().normalize();
+  const toMoon    = toMoonVec.normalize();
+  const fromMoon  = state.pos.clone().sub(moon.position).normalize();
+  const speed     = state.vel.length();
+  const prograde  = speed > 0.00005 ? state.vel.clone().normalize() : fromEarth;
+  const retrograde= prograde.clone().negate();
 
-// ═══════════════════════════════════════════════
-// START / RESTART
-// ═══════════════════════════════════════════════
-function startGame() {
-  document.getElementById('overlay').style.display = 'none';
-  document.getElementById('win-overlay').style.display = 'none';
-  state.started = true;
-  state.phase   = PHASE.LAUNCH;
-  showPhaseBanner(PHASE.LAUNCH);
-  // Orient shuttle pointing up from earth surface
-  state.rot.setFromUnitVectors(new THREE.Vector3(0,0,-1), new THREE.Vector3(0,1,0));
+  let targetDir = null;
+  state.apThrottle = 0;
+
+  switch (state.phase) {
+    case PHASE.LAUNCH:
+      // Burn straight up from Earth surface
+      targetDir = fromEarth;
+      state.apThrottle = 1.0;
+      state.apAction = 'Full thrust — vertical climb';
+      break;
+
+    case PHASE.ASCENT: {
+      // Gravity turn: tilt toward the Moon as altitude builds
+      const t = Math.min(1, altitude / 0.10);
+      // "East" = direction perpendicular to up, pointing roughly toward Moon
+      const east = toMoon.clone().sub(fromEarth.clone().multiplyScalar(toMoon.dot(fromEarth))).normalize();
+      const tiltTarget = fromEarth.clone().lerp(east, t * 0.65).normalize();
+      // Also blend toward prograde as horizontal speed builds
+      const sBlend = Math.min(1, speed / 0.008);
+      targetDir = tiltTarget.clone().lerp(prograde, sBlend * 0.4).normalize();
+      state.apThrottle = 1.0;
+      state.apAction = `Gravity turn ${(t*100).toFixed(0)}%`;
+      break;
+    }
+
+    case PHASE.ORBIT:
+      // Keep burning prograde to escape Earth — transition to TLI handled by phase logic
+      targetDir = prograde.length() > 0.5 ? prograde : toMoon;
+      state.apThrottle = 0.9;
+      state.apAction = 'Building orbital velocity';
+      break;
+
+    case PHASE.TLI:
+      // Burn hard toward the Moon
+      targetDir = toMoon;
+      state.apThrottle = 1.0;
+      state.apAction = 'Burn for the Moon!';
+      break;
+
+    case PHASE.COAST:
+      // No thrust — just drift (time-warp kicks in)
+      targetDir = prograde;
+      state.apThrottle = 0;
+      state.apAction = `Coasting  ·  ${distMoon.toFixed(0)} units to Moon`;
+      break;
+
+    case PHASE.APPROACH: {
+      // Flip retrograde and brake when near Moon
+      const brakeDist = 18;
+      targetDir = retrograde;
+      state.apThrottle = distMoon < brakeDist && speed > 0.003 ? 0.75 : 0;
+      state.apAction = distMoon < brakeDist ? 'Retrograde brake burn' : `Approach — aligning retrograde`;
+      break;
+    }
+
+    case PHASE.LANDING: {
+      // Point nose "up" from Moon, brake descent
+      targetDir = fromMoon;
+      const surfDist = distMoon - MOON_RADIUS;
+      state.apThrottle = speed > 0.002 ? 0.55 : (surfDist < 0.15 ? 0.18 : 0);
+      state.apAction = `Descent  ·  ${(surfDist*1000).toFixed(1)} km above surface`;
+      break;
+    }
+  }
+
+  if (targetDir && targetDir.length() > 0.5) {
+    rotateToward(targetDir, dt, 1.2);
+  }
 }
 
-document.getElementById('start-btn').addEventListener('click', startGame);
-document.getElementById('restart-btn').addEventListener('click', () => {
-  state = {
-    started: true, phase: PHASE.LAUNCH,
-    pos: new THREE.Vector3(0, EARTH_RADIUS + 0.005, 0),
-    vel: new THREE.Vector3(0,0,0),
-    rot: new THREE.Quaternion(),
-    fuel: FUEL_MAX, throttle: 0, thrusting: false, sasOn: false,
-    missionTime: 0, srbSep: false, cameraMode: 0, gForce: 1, prevVel: new THREE.Vector3(),
-    phaseBannerTimer: 0, warpFactor: 1,
-  };
-  state.rot.setFromUnitVectors(new THREE.Vector3(0,0,-1), new THREE.Vector3(0,1,0));
-  document.getElementById('win-overlay').style.display = 'none';
-  showPhaseBanner(PHASE.LAUNCH);
-});
-
 // ═══════════════════════════════════════════════
-// PHASE BANNER
-// ═══════════════════════════════════════════════
-function showPhaseBanner(text) {
-  const el = document.getElementById('phase-banner');
-  el.textContent = text;
-  el.style.opacity = '1';
-  state.phaseBannerTimer = 3.0;
-}
-
-// ═══════════════════════════════════════════════
-// PHYSICS UPDATE
+// PHYSICS
 // ═══════════════════════════════════════════════
 function updatePhysics(dt) {
   if (!state.started || state.phase === PHASE.LANDED) return;
 
-  // Time warp auto-increase in coast phase
+  // Time warp
   if (state.phase === PHASE.COAST) {
-    state.warpFactor = Math.min(50, state.warpFactor + dt);
+    const targetWarp = state.manualWarp ? 200 : 50;
+    state.warpFactor = Math.min(targetWarp, state.warpFactor + dt * 5);
   } else {
     state.warpFactor = 1;
+    state.manualWarp = false;
   }
   const wdt = dt * state.warpFactor;
 
   state.missionTime += wdt;
 
-  // Orientation matrix from quaternion
+  // Nose direction (forward = -Z local space, thrust = nose direction)
   const forward = new THREE.Vector3(0,0,-1).applyQuaternion(state.rot);
-  const up      = new THREE.Vector3(0,1,0).applyQuaternion(state.rot);
 
-  // ── Controls ──
-  const torque = RCS_TORQUE * dt;
+  // ── Player rotation input ──
+  const torque = 0.85 * dt;
   if (keys['ArrowUp'])    state.rot.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0), -torque));
   if (keys['ArrowDown'])  state.rot.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),  torque));
   if (keys['ArrowLeft'])  state.rot.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),  torque));
@@ -746,338 +625,332 @@ function updatePhysics(dt) {
   if (keys['q'])          state.rot.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), -torque));
   if (keys['e'])          state.rot.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),  torque));
 
-  // SAS — damp angular momentum (stub: gradually aligns to velocity vector in orbit)
-  if (state.sasOn && state.vel.length() > 0.01) {
-    // gentle stability — damp excess rotation by slerping rot toward stable
-    // We simply stop rotation changes beyond user input when SAS is on
-  }
+  // ── Thrust: player OR autopilot ──
+  const playerThrust = (keys[' '] || keys['r']) && state.fuel > 0;
+  const apThrust     = state.autopilot && state.apThrottle > 0 && state.fuel > 0;
+  state.thrusting    = playerThrust || apThrust;
 
-  // ── Thrust ──
-  state.thrusting = (keys[' '] || keys['r']) && state.fuel > 0;
   if (state.thrusting) {
-    state.throttle = Math.min(1, state.throttle + dt*2);
-    const thrustAcc = THRUST_FORCE * state.throttle; // m/s²
-    // Convert to scene units/s² (1 scene unit = 1000 km, 1 real second = game second at warp 1)
-    // We use a compressed timescale: 1 scene unit distance, velocities in scene units/s
-    // Tune: ~0.015 scene‑unit/s² = roughly enough to escape Earth in ~30s game time
-    const thrustScaled = 0.012 * state.throttle * wdt;
-    const thrustDir = forward.clone().negate(); // nozzle at back
-    state.vel.addScaledVector(thrustDir, thrustScaled);
+    const tLevel = Math.max(playerThrust ? 1 : 0, state.apThrottle);
+    state.throttle = Math.min(1, state.throttle + dt * 3);
 
-    const fuelRate = 0.35 * state.throttle * wdt / dt; // per real second
+    // Thrust pushes shuttle in the direction the NOSE points (forward = -Z local)
+    const thrustMag = 0.013 * state.throttle * wdt;
+    state.vel.addScaledVector(forward, thrustMag);
+
+    const fuelRate = 0.32 * state.throttle;
     state.fuel = Math.max(0, state.fuel - fuelRate * dt);
   } else {
-    state.throttle = Math.max(0, state.throttle - dt*3);
+    state.throttle = Math.max(0, state.throttle - dt * 4);
   }
 
   // ── Gravity ──
-  const distEarth  = state.pos.length();
-  const distMoonVec = state.pos.clone().sub(moon.position);
-  const distMoon   = distMoonVec.length();
+  const distEarth = state.pos.length();
+  const toMoonVec = state.pos.clone().sub(moon.position);
+  const distMoon  = toMoonVec.length();
 
-  // Earth gravity: g * (Re/r)^2, scaled
-  const gEarth_scale = 0.00006; // tune for fun gameplay
-  const gEarth = gEarth_scale * Math.pow(EARTH_RADIUS / distEarth, 2);
-  const earthDir = state.pos.clone().negate().normalize();
-  state.vel.addScaledVector(earthDir, gEarth * wdt);
+  const gE = 0.000065 * Math.pow(EARTH_RADIUS / distEarth, 2);
+  state.vel.addScaledVector(state.pos.clone().negate().normalize(), gE * wdt);
 
-  // Moon gravity (stronger near moon)
-  const gMoon_scale = 0.000015;
-  const gMoon = gMoon_scale * Math.pow(MOON_RADIUS / Math.max(distMoon, MOON_RADIUS*1.1), 2);
-  const moonDir = distMoonVec.clone().negate().normalize();
-  state.vel.addScaledVector(moonDir, gMoon * wdt);
+  const gM = 0.000018 * Math.pow(MOON_RADIUS / Math.max(distMoon, MOON_RADIUS*1.1), 2);
+  state.vel.addScaledVector(toMoonVec.clone().negate().normalize(), gM * wdt);
 
   // ── Atmospheric drag ──
   const altitude = distEarth - EARTH_RADIUS;
   if (altitude < ATMO_HEIGHT) {
-    const dragFactor = 1 - (altitude / ATMO_HEIGHT);
-    const drag = 0.015 * dragFactor * wdt;
-    state.vel.multiplyScalar(1 - drag);
+    const dragFactor = (1 - altitude / ATMO_HEIGHT);
+    state.vel.multiplyScalar(1 - 0.018 * dragFactor * wdt);
   }
 
-  // ── Integrate position ──
+  // ── Integrate ──
   state.pos.addScaledVector(state.vel, wdt);
 
   // ── G-Force ──
-  const deltaV = state.vel.clone().sub(state.prevVel).length() / dt;
-  state.gForce = 1 + deltaV / 0.0001;  // normalize
+  const dv = state.vel.clone().sub(state.prevVel).length() / Math.max(dt,0.001);
+  state.gForce = Math.max(1, 1 + dv / 0.00015);
   state.prevVel.copy(state.vel);
 
-  // ── Collision: Earth surface ──
-  if (distEarth < EARTH_RADIUS + 0.004 && state.phase !== PHASE.LAUNCH && state.phase !== PHASE.PRELAUNCH) {
-    state.vel.multiplyScalar(0);
-    state.pos.normalize().multiplyScalar(EARTH_RADIUS + 0.005);
-    // Crash — could add crash screen, for now just reset vel
+  // ── SRB separation ──
+  if (!state.srbSep && altitude > 0.045) {
+    state.srbSep = true;
+    fireSparks();
   }
 
-  // ── Collision: Moon surface ──
-  if (distMoon < MOON_RADIUS + 0.015 && (state.phase === PHASE.APPROACH || state.phase === PHASE.LANDING || state.phase === PHASE.COAST)) {
-    if (state.vel.length() < 0.005) {
-      // Soft landing!
+  // ── Phase transitions ──
+  updatePhase(distEarth, distMoon, altitude);
+
+  // ── Collisions ──
+  if (distEarth < EARTH_RADIUS + 0.004 && state.phase !== PHASE.LAUNCH && state.phase !== PHASE.PRELAUNCH) {
+    // Bounced back to surface — gentle "landed on earth" behavior
+    state.vel.multiplyScalar(-0.1);
+    state.pos.normalize().multiplyScalar(EARTH_RADIUS + 0.005);
+  }
+  if (distMoon < MOON_RADIUS + 0.02 && (state.phase === PHASE.APPROACH || state.phase === PHASE.LANDING)) {
+    if (state.vel.length() < 0.006) {
       triggerWin();
     } else {
-      // Too fast — bounce/crash, reset
-      state.vel.multiplyScalar(-0.2);
+      state.vel.multiplyScalar(-0.15); // crash bounce
     }
   }
-
-  // ── Auto phase transitions ──
-  updatePhase(distEarth, distMoon, altitude);
 }
 
 function updatePhase(distEarth, distMoon, altitude) {
-  if (!state.started) return;
-
-  // SRB separation at ~45km altitude
-  if (!state.srbSep && altitude > 0.045) {
-    state.srbSep = true;
-    triggerSRBSep();
-  }
-
-  if (state.phase === PHASE.LAUNCH && altitude > 0.02) {
-    state.phase = PHASE.ASCENT;
-    showPhaseBanner(PHASE.ASCENT);
-  }
-  if (state.phase === PHASE.ASCENT && altitude > 0.10) {
-    state.phase = PHASE.ORBIT;
-    showPhaseBanner(PHASE.ORBIT);
-  }
-  if (state.phase === PHASE.ORBIT && altitude > 0.5) {
-    state.phase = PHASE.TLI;
-    showPhaseBanner('TRANS-LUNAR INJECTION');
-  }
-  if (state.phase === PHASE.TLI && distEarth > 50) {
-    state.phase = PHASE.COAST;
-    showPhaseBanner(PHASE.COAST);
-  }
-  if (state.phase === PHASE.COAST && distMoon < 20) {
-    state.phase = PHASE.APPROACH;
-    showPhaseBanner(PHASE.APPROACH);
-    state.warpFactor = 1;
-  }
-  if (state.phase === PHASE.APPROACH && distMoon < 2) {
-    state.phase = PHASE.LANDING;
-    showPhaseBanner(PHASE.LANDING);
+  switch (state.phase) {
+    case PHASE.LAUNCH:
+      if (altitude > 0.022) { state.phase=PHASE.ASCENT; showBanner(PHASE.ASCENT); }
+      break;
+    case PHASE.ASCENT:
+      if (altitude > 0.10)  { state.phase=PHASE.ORBIT;  showBanner(PHASE.ORBIT);  }
+      break;
+    case PHASE.ORBIT:
+      if (altitude > 0.55 || state.vel.length() > 0.012) { state.phase=PHASE.TLI; showBanner('TRANS-LUNAR INJECTION'); }
+      break;
+    case PHASE.TLI:
+      if (distEarth > 55)   { state.phase=PHASE.COAST;  showBanner(PHASE.COAST);  }
+      break;
+    case PHASE.COAST:
+      if (distMoon < 20)    { state.phase=PHASE.APPROACH; showBanner(PHASE.APPROACH); state.warpFactor=1; }
+      break;
+    case PHASE.APPROACH:
+      if (distMoon < 2.5)   { state.phase=PHASE.LANDING; showBanner(PHASE.LANDING); }
+      break;
   }
 }
 
-function triggerSRBSep() {
-  // Activate sparks at SRB positions
-  const sp = sparks;
-  sp.userData.active = true;
-  sp.userData.timer  = 2.0;
-  const N = 150;
-  for (let i=0;i<N;i++) {
-    const t = sp.geometry.attributes.position.array;
-    t[i*3]   = (Math.random()-0.5)*0.04;
-    t[i*3+1] = (Math.random()-0.5)*0.04;
-    t[i*3+2] = (Math.random()-0.5)*0.04;
-    sp.userData.vel[i*3]   = (Math.random()-0.5)*0.02;
-    sp.userData.vel[i*3+1] = (Math.random()-0.5)*0.02;
-    sp.userData.vel[i*3+2] = (Math.random()-0.5)*0.02;
-    sp.userData.life[i]    = Math.random();
+function fireSparks() {
+  const sp = sparks; sp.userData.active=true; sp.userData.timer=2.0;
+  const N=150; const origin=shuttle.position;
+  for(let i=0;i<N;i++){
+    const p=sp.geometry.attributes.position.array;
+    p[i*3]=origin.x+(Math.random()-0.5)*0.04;
+    p[i*3+1]=origin.y+(Math.random()-0.5)*0.04;
+    p[i*3+2]=origin.z+(Math.random()-0.5)*0.04;
+    sp.userData.vel[i*3]=(Math.random()-0.5)*0.025;
+    sp.userData.vel[i*3+1]=(Math.random()-0.5)*0.025;
+    sp.userData.vel[i*3+2]=(Math.random()-0.5)*0.025;
+    sp.userData.life[i]=Math.random();
   }
-  sp.geometry.attributes.position.needsUpdate = true;
-  sp.material.opacity = 1;
+  sp.geometry.attributes.position.needsUpdate=true;
+  sp.material.opacity=1;
 }
 
 function triggerWin() {
-  state.phase = PHASE.LANDED;
-  const t = Math.floor(state.missionTime);
-  const m = Math.floor(t/60); const s = t%60;
-  document.getElementById('win-stats').textContent =
-    `Mission time: ${m}m ${s}s | Fuel remaining: ${state.fuel.toFixed(1)}%`;
-  document.getElementById('win-overlay').style.display = 'flex';
+  state.phase=PHASE.LANDED;
+  const t=Math.floor(state.missionTime), m=Math.floor(t/60), s=t%60;
+  document.getElementById('win-stats').textContent=
+    `Mission time: ${m}m ${s}s  ·  Fuel remaining: ${state.fuel.toFixed(1)}%`;
+  document.getElementById('win-overlay').style.display='flex';
 }
 
 // ═══════════════════════════════════════════════
-// PLUME PARTICLE UPDATE
+// PLUME / SPARKS UPDATE
 // ═══════════════════════════════════════════════
 function updatePlume(dt) {
-  const { vel, life } = plume.userData;
-  const pos = plume.geometry.attributes.position.array;
-  const N = pos.length / 3;
-  const active = state.thrusting && state.fuel > 0;
+  const {vel,life}=plume.userData;
+  const pos=plume.geometry.attributes.position.array;
+  const N=pos.length/3;
+  const active=state.thrusting && state.fuel>0;
 
-  // Plume emits from shuttle nozzle (world pos)
-  const nozzleLocal = new THREE.Vector3(0, 0, 0.015);
-  const nozzleWorld = nozzleLocal.applyMatrix4(shuttle.matrixWorld);
-  const backDir = new THREE.Vector3(0,0,1).applyQuaternion(state.rot); // plume goes backward
+  // Nozzle is at +Z local = back of shuttle
+  const nozzle=new THREE.Vector3(0,0,0.015*0.15).applyMatrix4(shuttle.matrixWorld);
+  // Plume goes backward (away from nose = +Z local direction in world)
+  const back=new THREE.Vector3(0,0,1).applyQuaternion(state.rot);
 
-  for (let i=0; i<N; i++) {
-    life[i] -= dt * (active ? 3.5 : 6);
-    if (life[i] <= 0) {
-      if (!active) { life[i] = 0; pos[i*3]=1e9; continue; }
-      // Reset particle
-      life[i] = 1;
-      pos[i*3]   = nozzleWorld.x + (Math.random()-0.5)*0.002;
-      pos[i*3+1] = nozzleWorld.y + (Math.random()-0.5)*0.002;
-      pos[i*3+2] = nozzleWorld.z + (Math.random()-0.5)*0.002;
-      const spread = 0.015;
-      vel[i*3]   = backDir.x*0.03 + (Math.random()-0.5)*spread;
-      vel[i*3+1] = backDir.y*0.03 + (Math.random()-0.5)*spread;
-      vel[i*3+2] = backDir.z*0.03 + (Math.random()-0.5)*spread;
+  for(let i=0;i<N;i++){
+    life[i]-=dt*(active?3.5:7);
+    if(life[i]<=0){
+      if(!active){life[i]=0;pos[i*3]=1e9;continue;}
+      life[i]=1;
+      pos[i*3]=nozzle.x+(Math.random()-0.5)*0.002;
+      pos[i*3+1]=nozzle.y+(Math.random()-0.5)*0.002;
+      pos[i*3+2]=nozzle.z+(Math.random()-0.5)*0.002;
+      const sp=0.012;
+      vel[i*3]=back.x*0.025+(Math.random()-0.5)*sp;
+      vel[i*3+1]=back.y*0.025+(Math.random()-0.5)*sp;
+      vel[i*3+2]=back.z*0.025+(Math.random()-0.5)*sp;
     } else {
-      pos[i*3]   += vel[i*3]*dt*60;
-      pos[i*3+1] += vel[i*3+1]*dt*60;
-      pos[i*3+2] += vel[i*3+2]*dt*60;
+      pos[i*3]+=vel[i*3]*dt*60;
+      pos[i*3+1]+=vel[i*3+1]*dt*60;
+      pos[i*3+2]+=vel[i*3+2]*dt*60;
     }
   }
-  plume.geometry.attributes.position.needsUpdate = true;
-  plume.material.opacity = active ? 0.75 : 0;
-  // Color shifts yellow→red→invisible by life
-  plume.material.color.setHSL(active ? 0.08 : 0.05, 1, 0.6);
-  plume.material.size = 0.003 + state.throttle * 0.005;
+  plume.geometry.attributes.position.needsUpdate=true;
+  plume.material.opacity=active?0.75:0;
+  plume.material.size=0.003+state.throttle*0.005;
 }
 
 function updateSparks(dt) {
-  const sp = sparks;
-  if (!sp.userData.active) return;
-  sp.userData.timer -= dt;
-  if (sp.userData.timer <= 0) { sp.userData.active=false; sp.material.opacity=0; return; }
-
-  const pos = sp.geometry.attributes.position.array;
-  const { vel, life } = sp.userData;
-  const N = pos.length/3;
-  const origin = shuttle.position.clone();
-  for (let i=0;i<N;i++) {
-    life[i] -= dt*2;
-    if (life[i]<=0) {
-      life[i]=1;
-      pos[i*3]=origin.x+(Math.random()-0.5)*0.05;
-      pos[i*3+1]=origin.y+(Math.random()-0.5)*0.05;
-      pos[i*3+2]=origin.z+(Math.random()-0.5)*0.05;
-    } else {
-      pos[i*3]  +=vel[i*3]  *dt*20;
-      pos[i*3+1]+=vel[i*3+1]*dt*20;
-      pos[i*3+2]+=vel[i*3+2]*dt*20;
-    }
+  const sp=sparks;
+  if(!sp.userData.active) return;
+  sp.userData.timer-=dt;
+  if(sp.userData.timer<=0){sp.userData.active=false;sp.material.opacity=0;return;}
+  const pos=sp.geometry.attributes.position.array;
+  const {vel,life}=sp.userData;
+  const origin=shuttle.position;
+  for(let i=0;i<pos.length/3;i++){
+    life[i]-=dt*2;
+    if(life[i]<=0){life[i]=1;pos[i*3]=origin.x+(Math.random()-0.5)*0.05;pos[i*3+1]=origin.y+(Math.random()-0.5)*0.05;pos[i*3+2]=origin.z+(Math.random()-0.5)*0.05;}
+    else{pos[i*3]+=vel[i*3]*dt*20;pos[i*3+1]+=vel[i*3+1]*dt*20;pos[i*3+2]+=vel[i*3+2]*dt*20;}
   }
   sp.geometry.attributes.position.needsUpdate=true;
-  sp.material.opacity = Math.min(1, sp.userData.timer);
+  sp.material.opacity=Math.min(1,sp.userData.timer);
 }
 
 // ═══════════════════════════════════════════════
 // CAMERA
 // ═══════════════════════════════════════════════
-const camSmooth = new THREE.Vector3();
-const camLookAt = new THREE.Vector3();
+const camPos=new THREE.Vector3(); const camLook=new THREE.Vector3();
 
 function updateCamera() {
-  const shuttlePos = shuttle.position;
-  const forward = new THREE.Vector3(0,0,-1).applyQuaternion(state.rot);
-  const up      = new THREE.Vector3(0,1,0).applyQuaternion(state.rot);
-  const right   = new THREE.Vector3(1,0,0).applyQuaternion(state.rot);
+  const sp=shuttle.position;
+  const fwd=new THREE.Vector3(0,0,-1).applyQuaternion(state.rot);
+  const up =new THREE.Vector3(0,1,0).applyQuaternion(state.rot);
 
-  if (state.cameraMode === 0) {
-    // Chase cam — behind and slightly above shuttle
-    const offset = forward.clone().negate().multiplyScalar(0.12).add(up.clone().multiplyScalar(0.04));
-    const target = shuttlePos.clone().add(offset);
-    camSmooth.lerp(target, 0.06);
-    camera.position.copy(camSmooth);
-    camLookAt.lerp(shuttlePos.clone().add(forward.clone().multiplyScalar(0.05)), 0.1);
-    camera.lookAt(camLookAt);
-  } else if (state.cameraMode === 1) {
+  if(state.cameraMode===0){
+    // Chase — behind shuttle
+    const offset=fwd.clone().negate().multiplyScalar(0.13).add(up.clone().multiplyScalar(0.04));
+    camPos.lerp(sp.clone().add(offset),0.07);
+    camera.position.copy(camPos);
+    camLook.lerp(sp.clone().add(fwd.clone().multiplyScalar(0.05)),0.12);
+    camera.lookAt(camLook);
+  } else if(state.cameraMode===1){
     // Cockpit
-    const cockpit = shuttlePos.clone().add(forward.clone().multiplyScalar(-0.01)).add(up.clone().multiplyScalar(0.01));
-    camera.position.copy(cockpit);
-    camera.lookAt(shuttlePos.clone().add(forward.clone().negate().multiplyScalar(0.3)));
+    camera.position.copy(sp.clone().add(fwd.clone().multiplyScalar(-0.005)).add(up.clone().multiplyScalar(0.01)));
+    camera.lookAt(sp.clone().add(fwd.clone().negate().multiplyScalar(0.4)));
   } else {
-    // Orbital — far back, Earth in view
-    const dist = Math.max(2, shuttle.position.length() * 0.5);
-    const orbitPos = shuttlePos.clone().normalize().multiplyScalar(dist + 3);
-    camSmooth.lerp(orbitPos, 0.02);
-    camera.position.copy(camSmooth);
-    camera.lookAt(0,0,0);
+    // Orbital — pull back to see Earth
+    const dist=Math.max(1.5, sp.length()*0.4+2);
+    camPos.lerp(sp.clone().normalize().multiplyScalar(dist+3),0.015);
+    camera.position.copy(camPos); camera.lookAt(0,0,0);
   }
 }
 
 // ═══════════════════════════════════════════════
-// HUD UPDATE
+// HUD
 // ═══════════════════════════════════════════════
 function updateHUD() {
-  const distEarth = state.pos.length();
-  const altitude  = (distEarth - EARTH_RADIUS) * 1000; // km
-  const velocity  = state.vel.length() * 10000;         // m/s (scaled)
+  const distEarth=state.pos.length();
+  const altitude=(distEarth-EARTH_RADIUS)*1000;
+  const velocity=state.vel.length()*10000;
 
-  document.getElementById('t-alt').textContent   = altitude < 1000 ? altitude.toFixed(1)+' km' : (altitude/1000).toFixed(2)+' Mm';
+  document.getElementById('t-alt').textContent   = altitude<1000?altitude.toFixed(1)+' km':(altitude/1000).toFixed(2)+' Mm';
   document.getElementById('t-vel').textContent   = velocity.toFixed(0)+' m/s';
   document.getElementById('t-fuel').textContent  = state.fuel.toFixed(1)+'%';
   document.getElementById('fuel-bar').style.width= state.fuel+'%';
-  document.getElementById('throttle-bar').style.width= (state.throttle*100)+'%';
-  document.getElementById('t-gforce').textContent= Math.min(state.gForce, 99).toFixed(2)+' g';
+  document.getElementById('throttle-bar').style.width=(state.throttle*100)+'%';
+  document.getElementById('t-gforce').textContent= Math.min(state.gForce,99).toFixed(2)+' g';
   document.getElementById('t-phase').textContent = state.phase;
 
-  const t = Math.floor(state.missionTime);
-  const m = Math.floor(t/60); const s = t%60;
-  document.getElementById('t-time').textContent = `T+${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const t=Math.floor(state.missionTime), m=Math.floor(t/60), s=t%60;
+  document.getElementById('t-time').textContent=`T+${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 
-  const moonDist = state.pos.clone().sub(moon.position).length() * 1000;
-  document.getElementById('t-moondist').textContent = moonDist > 1000 ? (moonDist/1000).toFixed(0)+' Mm' : moonDist.toFixed(1)+' km';
+  const moonDist=state.pos.clone().sub(moon.position).length()*1000;
+  document.getElementById('t-moondist').textContent=moonDist>1000?(moonDist/1000).toFixed(1)+' Mm':moonDist.toFixed(1)+' km';
 
-  // Orbit estimates (simple periapsis/apoapsis)
-  const r = distEarth; const v = state.vel.length();
-  const mu = 0.00006 * EARTH_RADIUS * EARTH_RADIUS; // gravitational parameter (scene units)
-  const vesc = Math.sqrt(2 * mu / r);
-  const energy = 0.5*v*v - mu/r;
-  if (energy < 0) {
-    const a = -mu / (2*energy);
-    const ecc = Math.abs(1 - r/a);
-    const apo  = Math.max(0, a*(1+ecc) - EARTH_RADIUS);
-    const peri = Math.max(0, a*(1-ecc) - EARTH_RADIUS);
-    document.getElementById('t-apo').textContent  = (apo*1000).toFixed(1)+' km';
-    document.getElementById('t-peri').textContent = (peri*1000).toFixed(1)+' km';
+  // Orbit data
+  const r=distEarth, v=state.vel.length(), mu=0.000065*EARTH_RADIUS*EARTH_RADIUS;
+  const energy=0.5*v*v-mu/r;
+  if(energy<0){
+    const a=-mu/(2*energy);
+    const ecc=Math.abs(1-r/a);
+    document.getElementById('t-apo').textContent  = (Math.max(0,a*(1+ecc)-EARTH_RADIUS)*1000).toFixed(1)+' km';
+    document.getElementById('t-peri').textContent = (Math.max(0,a*(1-ecc)-EARTH_RADIUS)*1000).toFixed(1)+' km';
   } else {
-    document.getElementById('t-apo').textContent  = '∞';
-    document.getElementById('t-peri').textContent = '-';
+    document.getElementById('t-apo').textContent='∞';
+    document.getElementById('t-peri').textContent='-';
   }
+
+  // Autopilot badge
+  const badge=document.getElementById('ap-badge');
+  if(state.autopilot){ badge.className='auto'; badge.textContent='● AUTOPILOT'; }
+  else               { badge.className='manual'; badge.textContent='◉ MANUAL'; }
+
+  // AP action text
+  document.getElementById('ap-action').textContent = state.autopilot ? state.apAction : 'Manual control active';
+
+  // Time warp indicator
+  const wb=document.getElementById('warp-badge');
+  if(state.warpFactor>2){
+    wb.textContent=`⏩ ${Math.round(state.warpFactor)}× WARP`; wb.style.opacity='1';
+  } else { wb.style.opacity='0'; }
 
   // Phase banner fade
-  if (state.phaseBannerTimer > 0) {
-    state.phaseBannerTimer -= 1/60;
-    if (state.phaseBannerTimer <= 0) {
-      document.getElementById('phase-banner').style.opacity = '0';
-    }
+  if(state.phaseBannerTimer>0){
+    state.phaseBannerTimer-=1/60;
+    if(state.phaseBannerTimer<=0) document.getElementById('phase-banner').style.opacity='0';
   }
+}
+
+function showBanner(text) {
+  const el=document.getElementById('phase-banner');
+  el.textContent=text; el.style.opacity='1';
+  state.phaseBannerTimer=3.5;
 }
 
 // ═══════════════════════════════════════════════
 // SCENE UPDATE
 // ═══════════════════════════════════════════════
 function updateScene() {
-  // Position shuttle
   shuttle.position.copy(state.pos);
   shuttle.quaternion.copy(state.rot);
-
-  // Slow Earth rotation
-  earth.rotation.y += 0.0002;
-
-  // Moon orbits (very slow, mostly static)
-  moon.rotation.y += 0.00003;
-
-  // Earth fill light follows shuttle
-  earthFill.position.copy(state.pos.clone().normalize().multiplyScalar(EARTH_RADIUS * 0.5));
-
-  // Landing pad pulsing glow
-  const pulse = Math.sin(Date.now() * 0.003) * 0.5 + 0.5;
-  landPad.material.emissive.setRGB(0.4*pulse, 0.2*pulse, 0);
-
-  // Stars always around camera
+  earth.rotation.y+=0.0002;
+  moon.rotation.y+=0.00003;
+  earthFill.position.copy(state.pos.clone().normalize().multiplyScalar(EARTH_RADIUS*0.5));
+  const pulse=Math.sin(Date.now()*0.003)*0.5+0.5;
+  landPad.material.emissive.setRGB(0.4*pulse,0.2*pulse,0);
   stars.position.copy(camera.position);
 }
 
 // ═══════════════════════════════════════════════
+// TOUCH BUTTON SETUP
+// ═══════════════════════════════════════════════
+function setupBtn(id, key) {
+  const el=document.getElementById(id); if(!el) return;
+  const on=()=>{keys[key]=true;el.classList.add('active');};
+  const off=()=>{keys[key]=false;el.classList.remove('active');};
+  el.addEventListener('pointerdown',on); el.addEventListener('pointerup',off); el.addEventListener('pointerleave',off);
+}
+setupBtn('btn-thrust','  ');  // double-space as manual override key
+setupBtn('btn-pitch-up','ArrowUp'); setupBtn('btn-pitch-down','ArrowDown');
+setupBtn('btn-yaw-left','ArrowLeft'); setupBtn('btn-yaw-right','ArrowRight');
+setupBtn('btn-roll-left','q'); setupBtn('btn-roll-right','e');
+
+// Thrust button maps to Space
+document.getElementById('btn-thrust').addEventListener('pointerdown',()=>{ keys[' ']=true; document.getElementById('btn-thrust').classList.add('active'); });
+document.getElementById('btn-thrust').addEventListener('pointerup',  ()=>{ keys[' ']=false; document.getElementById('btn-thrust').classList.remove('active'); });
+document.getElementById('btn-thrust').addEventListener('pointerleave',()=>{ keys[' ']=false; document.getElementById('btn-thrust').classList.remove('active'); });
+
+document.getElementById('btn-cam').addEventListener('click',()=>{ state.cameraMode=(state.cameraMode+1)%3; });
+
+document.getElementById('btn-ap').addEventListener('click',()=>{
+  state.autopilot=!state.autopilot;
+  document.getElementById('btn-ap').style.borderColor=state.autopilot?'#0f0':'#f80';
+  document.getElementById('btn-ap').style.color=state.autopilot?'#0f0':'#f80';
+});
+
+document.getElementById('btn-warp').addEventListener('click',()=>{
+  if(state.phase===PHASE.COAST) state.manualWarp=!state.manualWarp;
+});
+
+// ── Start / restart ──
+function startGame() {
+  state=freshState(); state.started=true; state.phase=PHASE.LAUNCH;
+  showBanner('LAUNCH SEQUENCE INITIATED');
+  document.getElementById('overlay').style.display='none';
+  document.getElementById('win-overlay').style.display='none';
+}
+document.getElementById('start-btn').addEventListener('click', startGame);
+document.getElementById('restart-btn').addEventListener('click', startGame);
+
+// ═══════════════════════════════════════════════
 // MAIN LOOP
 // ═══════════════════════════════════════════════
-let lastTime = performance.now();
-
+let lastTime=performance.now();
 function animate() {
   requestAnimationFrame(animate);
-  const now = performance.now();
-  const dt  = Math.min((now - lastTime) / 1000, 0.05);
-  lastTime = now;
-
-  if (state.started) {
+  const now=performance.now(); const dt=Math.min((now-lastTime)/1000,0.05); lastTime=now;
+  if(state.started){
+    updateAutopilot(dt);
     updatePhysics(dt);
     updatePlume(dt);
     updateSparks(dt);
@@ -1085,24 +958,17 @@ function animate() {
     updateHUD();
   }
   updateCamera();
-
-  renderer.render(scene, camera);
+  renderer.render(scene,camera);
 }
 
-// ═══════════════════════════════════════════════
-// RESIZE
-// ═══════════════════════════════════════════════
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+window.addEventListener('resize',()=>{
+  camera.aspect=window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(window.innerWidth,window.innerHeight);
 });
 
-// ── Initial camera position ──
-camera.position.set(0, EARTH_RADIUS + 0.5, 2);
-camera.lookAt(0, EARTH_RADIUS, 0);
-
-// ── Start scene rendering even before game starts ──
+camera.position.set(0,EARTH_RADIUS+0.5,2);
+camera.lookAt(0,EARTH_RADIUS,0);
 animate();
 </script>
 </body>
