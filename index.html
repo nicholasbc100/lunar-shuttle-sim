@@ -231,6 +231,15 @@ const EARTH_RADIUS  = 6.371;
 const MOON_RADIUS   = 1.737;
 const MOON_DISTANCE = 384.4;
 const ATMO_HEIGHT   = 0.12;    // scene units
+const MAX_FUEL = 100;
+const ASTEROID_HIT_FUEL_PENALTY = 6;
+const ASTEROID_HIT_POINTS_PENALTY = 2;
+const ASTEROID_BASE_HIT_RADIUS = 0.028;
+const ASTEROID_HIT_SCALE_MULT = 0.003;
+const ASTEROID_DODGE_RADIUS = 0.09;
+const ASTEROID_DODGE_RESET_RADIUS = 0.18;
+const FUEL_PURCHASE_COST = 10;
+const FUEL_PURCHASE_AMOUNT = 20;
 
 const PHASE = {
   PRELAUNCH: 'PRE-LAUNCH',
@@ -511,7 +520,7 @@ function freshState() {
     pos: new THREE.Vector3(0, EARTH_RADIUS+0.005, 0),
     vel: new THREE.Vector3(0,0,0),
     rot: new THREE.Quaternion(),
-    fuel: 100, throttle: 0,
+    fuel: MAX_FUEL, throttle: 0,
     thrusting: false,
     missionTime: 0,
     srbSep: false,
@@ -666,16 +675,16 @@ function updateAsteroids(dt) {
     a.rotation.y += dt * (0.5 + i * 0.03);
     if (!nearEarth) continue;
     const distToShip = a.position.distanceTo(state.pos);
-    const hitRadius = 0.028 + a.scale.x * 0.003;
+    const hitRadius = ASTEROID_BASE_HIT_RADIUS + a.scale.x * ASTEROID_HIT_SCALE_MULT;
     if (distToShip < hitRadius && state.asteroidHitCooldown <= 0) {
-      state.fuel = Math.max(0, state.fuel - 6);
-      state.points = Math.max(0, state.points - 2);
+      state.fuel = Math.max(0, state.fuel - ASTEROID_HIT_FUEL_PENALTY);
+      state.points = Math.max(0, state.points - ASTEROID_HIT_POINTS_PENALTY);
       state.asteroidHitCooldown = 1.2;
       showBanner('ASTEROID HIT! -FUEL');
-    } else if (distToShip < 0.09 && !state.dodgedAsteroids.has(i)) {
+    } else if (distToShip < ASTEROID_DODGE_RADIUS && !state.dodgedAsteroids.has(i)) {
       state.dodgedAsteroids.add(i);
       state.points += 1;
-    } else if (distToShip > 0.18) {
+    } else if (distToShip > ASTEROID_DODGE_RESET_RADIUS) {
       state.dodgedAsteroids.delete(i);
     }
   }
@@ -713,6 +722,7 @@ function updatePhysics(dt) {
   if (keys['e'])          state.rot.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),  torque));
 
   // ── Thrust: player OR autopilot ──
+  // turboHold tracks user intent so HUD can show "ARMED" even before thrust starts.
   state.turboHold = (!!keys['Shift'] || !!keys['t']) && state.fuel > 0;
   state.turboActive = state.turboHold && (keys[' '] || keys['r'] || (state.autopilot && state.apThrottle > 0));
   const playerThrust = (keys[' '] || keys['r']) && state.fuel > 0;
@@ -1028,9 +1038,10 @@ document.getElementById('btn-warp').addEventListener('click',()=>{
 });
 
 function buyFuelWithPoints() {
-  if (state.points < 10 || state.fuel >= 100) return;
-  state.points -= 10;
-  state.fuel = Math.min(100, state.fuel + 20);
+  if (state.fuel >= MAX_FUEL) { showBanner('FUEL ALREADY FULL'); return; }
+  if (state.points < FUEL_PURCHASE_COST) { showBanner('NEED MORE POINTS'); return; }
+  state.points -= FUEL_PURCHASE_COST;
+  state.fuel = Math.min(MAX_FUEL, state.fuel + FUEL_PURCHASE_AMOUNT);
   showBanner('+20 FUEL BOUGHT');
 }
 document.getElementById('btn-fuel').addEventListener('click', buyFuelWithPoints);
