@@ -31,9 +31,13 @@ A **mobile-first, browser-based 3D space shuttle simulator** built with Three.js
 | `← →` | Yaw left / right |
 | `Q` / `E` | Roll left / right |
 | `R` | Fine RCS thruster burst |
+| `Shift` / `T` | Hold turbo boost |
+| `F` | Buy fuel with dodge points |
 
 #### Mobile (Touch)
 - **🔥 button** — Main thrust (hold)
+- **TURBO button** — Hold turbo boost
+- **⛽+ button** — Buy fuel with points
 - **D-pad arrows** — Pitch & yaw
 - **↺ / ↻** — Roll
 - **⚙ SAS** — Toggle auto-stabilization
@@ -51,7 +55,11 @@ A **mobile-first, browser-based 3D space shuttle simulator** built with Three.js
 ## ✨ Features
 
 - **Procedural Earth** — Painted land masses, ocean, ice caps, cloud wisps, and a multi-layer atmospheric glow — no texture URLs, everything is canvas-generated
+- **Enhanced Earth texture** — Added ocean shimmer/noise and richer atmospheric rim lighting for better visual depth
 - **Procedural Moon** — Cratered lunar surface with rim highlights
+- **Near-Earth asteroid field** — Dodge asteroids to earn points; collisions cost fuel and points
+- **Fuel economy loop** — Spend dodge points to buy fuel refills mid-mission
+- **Turbo engine mode** — Optional higher-acceleration boost with increased fuel consumption
 - **8,000-star field** — Color-accurate stars with blue giants and orange dwarfs
 - **Engine plume particle system** — Dynamic additive-blended particles that scale with throttle
 - **SRB separation sparks** — Pyrotechnic burst when solid rocket boosters detach at 45 km

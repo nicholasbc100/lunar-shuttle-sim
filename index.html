@@ -77,6 +77,8 @@
   .btn:active, .btn.active { background: rgba(0,150,255,0.5); transform: scale(0.92); border-color: #0cf; }
   #btn-thrust { width: 80px; height: 80px; font-size: 28px; background: rgba(255,80,0,0.3); border-color: rgba(255,120,0,0.6); }
   #btn-thrust.active { background: rgba(255,120,0,0.7); }
+  #btn-turbo { font-size: 12px; border-color: #ff0; color: #ff0; }
+  #btn-fuel { font-size: 12px; border-color: #0f8; color: #8ff; }
   .rotate-pad { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
   .rotate-pad .btn { width: 52px; height: 52px; font-size: 18px; }
 
@@ -124,8 +126,12 @@
     <div class="label">Fuel</div>
     <div class="bar-wrap"><div class="bar" id="fuel-bar" style="width:100%"></div></div>
     <div class="val" id="t-fuel">100%</div>
+    <div class="label">Dodge Points</div>
+    <div class="val" id="t-points">0 pts</div>
     <div class="label">Throttle</div>
     <div class="bar-wrap"><div class="bar" id="throttle-bar" style="width:0%"></div></div>
+    <div class="label">Turbo</div>
+    <div class="val" id="t-turbo">OFF</div>
     <div class="label">G-Force</div>
     <div class="val" id="t-gforce">1.00 g</div>
     <div class="label">Mission Time</div>
@@ -175,6 +181,8 @@
 
   <div class="ctrl-group right">
     <button class="btn" id="btn-cam"  title="Camera">📷</button>
+    <button class="btn" id="btn-fuel" title="Buy Fuel">⛽+</button>
+    <button class="btn" id="btn-turbo" title="Turbo Boost">TURBO</button>
     <button class="btn" id="btn-ap"   title="Toggle Autopilot" style="font-size:14px;border-color:#0f0">AUTO</button>
     <button class="btn" id="btn-warp" title="Time Warp" style="font-size:14px">WARP</button>
   </div>
@@ -187,6 +195,9 @@
   <div class="instructions">
     🤖 AUTOPILOT handles launch → orbit → TLI → Moon landing<br>
     🔥 THRUST — Hold Space or fire button to add manual thrust<br>
+    ⚡ TURBO — Hold Shift or TURBO button for stronger acceleration<br>
+    🪨 Dodge near-Earth asteroids to earn points<br>
+    ⛽ Spend 10 points on fuel refill during flight<br>
     ◀▶▲▼ Rotate — Arrow keys / touch pad (always active)<br>
     ↺↻ Roll — Q / E keys<br>
     AUTO — Toggle autopilot on/off<br>
@@ -220,6 +231,15 @@ const EARTH_RADIUS  = 6.371;
 const MOON_RADIUS   = 1.737;
 const MOON_DISTANCE = 384.4;
 const ATMO_HEIGHT   = 0.12;    // scene units
+const MAX_FUEL = 100;
+const ASTEROID_HIT_FUEL_PENALTY = 6;
+const ASTEROID_HIT_POINTS_PENALTY = 2;
+const ASTEROID_BASE_HIT_RADIUS = 0.028;
+const ASTEROID_HIT_SCALE_MULT = 0.003;
+const ASTEROID_DODGE_RADIUS = 0.09;
+const ASTEROID_DODGE_RESET_RADIUS = 0.18;
+const FUEL_PURCHASE_COST = 10;
+const FUEL_PURCHASE_AMOUNT = 20;
 
 const PHASE = {
   PRELAUNCH: 'PRE-LAUNCH',
@@ -260,6 +280,12 @@ function earthTex() {
   const ocean = ctx.createLinearGradient(0,0,0,512);
   ocean.addColorStop(0,'#0a2a5e'); ocean.addColorStop(0.5,'#0d3d7a'); ocean.addColorStop(1,'#061e4a');
   ctx.fillStyle = ocean; ctx.fillRect(0,0,1024,512);
+  for (let i=0;i<900;i++) {
+    const x=Math.random()*1024, y=Math.random()*512, r=Math.random()*1.4+0.2;
+    const a=Math.random()*0.18;
+    ctx.fillStyle=`rgba(120,170,220,${a})`;
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  }
   ctx.fillStyle = '#2d6e3a';
   [
     {x:200,y:160,rx:80,ry:70},{x:230,y:220,rx:60,ry:50},
@@ -275,6 +301,17 @@ function earthTex() {
     ctx.beginPath(); ctx.ellipse(x,y,w,h,0,0,Math.PI*2); ctx.fill();
   });
   ctx.globalAlpha=1;
+  for(let i=0;i<360;i++){
+    const x=Math.random()*1024, y=Math.random()*512;
+    const w=2+Math.random()*5, h=1+Math.random()*2;
+    ctx.fillStyle=`rgba(255,255,255,${0.03+Math.random()*0.08})`;
+    ctx.fillRect(x,y,w,h);
+  }
+  const rim = ctx.createRadialGradient(512,256,140,512,256,540);
+  rim.addColorStop(0,'rgba(80,160,255,0)');
+  rim.addColorStop(1,'rgba(120,200,255,0.22)');
+  ctx.fillStyle = rim;
+  ctx.fillRect(0,0,1024,512);
   return new THREE.CanvasTexture(c);
 }
 
@@ -432,6 +469,23 @@ function buildSparks() {
   return pts;
 }
 
+function buildAsteroids() {
+  const g = new THREE.Group();
+  const baseGeo = new THREE.IcosahedronGeometry(0.006, 1);
+  for (let i=0;i<14;i++) {
+    const hue = 26 + Math.random() * 12;
+    const rock = new THREE.Mesh(
+      baseGeo.clone(),
+      new THREE.MeshPhongMaterial({ color: new THREE.Color(`hsl(${hue},38%,38%)`), shininess: 4 })
+    );
+    const scale = 0.7 + Math.random() * 1.8;
+    rock.scale.setScalar(scale);
+    rock.userData = { angle: Math.random() * Math.PI * 2, radius: EARTH_RADIUS + 0.16 + Math.random() * 0.18, speed: 0.09 + Math.random() * 0.14, bob: Math.random() * Math.PI * 2 };
+    g.add(rock);
+  }
+  return g;
+}
+
 // ═══════════════════════════════════════════════
 // LIGHTING
 // ═══════════════════════════════════════════════
@@ -449,6 +503,7 @@ const moon    = buildMoon();      scene.add(moon);
 const shuttle = buildShuttle();   scene.add(shuttle);
 const plume   = buildPlume();     scene.add(plume);
 const sparks  = buildSparks();    scene.add(sparks);
+const asteroids = buildAsteroids(); scene.add(asteroids);
 
 const padGeo=new THREE.CylinderGeometry(0.08,0.08,0.005,16);
 const padMat=new THREE.MeshPhongMaterial({color:0xffcc00,emissive:0x553300});
@@ -465,7 +520,7 @@ function freshState() {
     pos: new THREE.Vector3(0, EARTH_RADIUS+0.005, 0),
     vel: new THREE.Vector3(0,0,0),
     rot: new THREE.Quaternion(),
-    fuel: 100, throttle: 0,
+    fuel: MAX_FUEL, throttle: 0,
     thrusting: false,
     missionTime: 0,
     srbSep: false,
@@ -479,6 +534,13 @@ function freshState() {
     autopilot: true,
     apThrottle: 0,
     apAction: '',
+    points: 0,
+    turboActive: false,
+    turboHold: false,
+    turboFuelDrain: 0.26,
+    turboBoost: 1.9,
+    asteroidHitCooldown: 0,
+    dodgedAsteroids: new Set(),
   };
   // Orient nose pointing away from Earth (+Y direction → nose is -Z local → rotate -Z to +Y)
   s.rot.setFromUnitVectors(new THREE.Vector3(0,0,-1), new THREE.Vector3(0,1,0));
@@ -595,6 +657,40 @@ function updateAutopilot(dt) {
   }
 }
 
+function updateAsteroids(dt) {
+  const nearEarth = state.pos.length() < EARTH_RADIUS + 1.2;
+  for (let i=0;i<asteroids.children.length;i++) {
+    const a = asteroids.children[i];
+    const d = a.userData;
+    d.angle += d.speed * dt;
+    d.bob += dt * (0.8 + i * 0.03);
+    const radial = d.radius + Math.sin(d.bob) * 0.015;
+    const incl = 0.16 + (i % 5) * 0.03;
+    a.position.set(
+      Math.cos(d.angle) * radial,
+      Math.sin(d.angle * 0.8) * incl,
+      Math.sin(d.angle) * radial
+    );
+    a.rotation.x += dt * (0.7 + i * 0.02);
+    a.rotation.y += dt * (0.5 + i * 0.03);
+    if (!nearEarth) continue;
+    const distToShip = a.position.distanceTo(state.pos);
+    const hitRadius = ASTEROID_BASE_HIT_RADIUS + a.scale.x * ASTEROID_HIT_SCALE_MULT;
+    if (distToShip < hitRadius && state.asteroidHitCooldown <= 0) {
+      state.fuel = Math.max(0, state.fuel - ASTEROID_HIT_FUEL_PENALTY);
+      state.points = Math.max(0, state.points - ASTEROID_HIT_POINTS_PENALTY);
+      state.asteroidHitCooldown = 1.2;
+      showBanner('ASTEROID HIT! -FUEL');
+    } else if (distToShip < ASTEROID_DODGE_RADIUS && !state.dodgedAsteroids.has(i)) {
+      state.dodgedAsteroids.add(i);
+      state.points += 1;
+    } else if (distToShip > ASTEROID_DODGE_RESET_RADIUS) {
+      state.dodgedAsteroids.delete(i);
+    }
+  }
+  state.asteroidHitCooldown = Math.max(0, state.asteroidHitCooldown - dt);
+}
+
 // ═══════════════════════════════════════════════
 // PHYSICS
 // ═══════════════════════════════════════════════
@@ -626,6 +722,9 @@ function updatePhysics(dt) {
   if (keys['e'])          state.rot.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),  torque));
 
   // ── Thrust: player OR autopilot ──
+  // turboHold tracks user intent so HUD can show "ARMED" even before thrust starts.
+  state.turboHold = (!!keys['Shift'] || !!keys['t']) && state.fuel > 0;
+  state.turboActive = state.turboHold && (keys[' '] || keys['r'] || (state.autopilot && state.apThrottle > 0));
   const playerThrust = (keys[' '] || keys['r']) && state.fuel > 0;
   const apThrust     = state.autopilot && state.apThrottle > 0 && state.fuel > 0;
   state.thrusting    = playerThrust || apThrust;
@@ -635,13 +734,15 @@ function updatePhysics(dt) {
     state.throttle = Math.min(1, state.throttle + dt * 3);
 
     // Thrust pushes shuttle in the direction the NOSE points (forward = -Z local)
-    const thrustMag = 0.013 * state.throttle * wdt;
+    const turboMul = state.turboActive ? state.turboBoost : 1;
+    const thrustMag = 0.013 * state.throttle * turboMul * wdt;
     state.vel.addScaledVector(forward, thrustMag);
 
-    const fuelRate = 0.32 * state.throttle;
+    const fuelRate = 0.32 * state.throttle + (state.turboActive ? state.turboFuelDrain * state.throttle : 0);
     state.fuel = Math.max(0, state.fuel - fuelRate * dt);
   } else {
     state.throttle = Math.max(0, state.throttle - dt * 4);
+    state.turboActive = false;
   }
 
   // ── Gravity ──
@@ -692,6 +793,7 @@ function updatePhysics(dt) {
       state.vel.multiplyScalar(-0.15); // crash bounce
     }
   }
+  updateAsteroids(dt);
 }
 
 function updatePhase(distEarth, distMoon, altitude) {
@@ -837,7 +939,9 @@ function updateHUD() {
   document.getElementById('t-vel').textContent   = velocity.toFixed(0)+' m/s';
   document.getElementById('t-fuel').textContent  = state.fuel.toFixed(1)+'%';
   document.getElementById('fuel-bar').style.width= state.fuel+'%';
+  document.getElementById('t-points').textContent = state.points+' pts';
   document.getElementById('throttle-bar').style.width=(state.throttle*100)+'%';
+  document.getElementById('t-turbo').textContent = state.turboActive ? 'ON' : (state.turboHold ? 'ARMED' : 'OFF');
   document.getElementById('t-gforce').textContent= Math.min(state.gForce,99).toFixed(2)+' g';
   document.getElementById('t-phase').textContent = state.phase;
 
@@ -914,6 +1018,7 @@ setupBtn('btn-thrust','  ');  // double-space as manual override key
 setupBtn('btn-pitch-up','ArrowUp'); setupBtn('btn-pitch-down','ArrowDown');
 setupBtn('btn-yaw-left','ArrowLeft'); setupBtn('btn-yaw-right','ArrowRight');
 setupBtn('btn-roll-left','q'); setupBtn('btn-roll-right','e');
+setupBtn('btn-turbo','t');
 
 // Thrust button maps to Space
 document.getElementById('btn-thrust').addEventListener('pointerdown',()=>{ keys[' ']=true; document.getElementById('btn-thrust').classList.add('active'); });
@@ -930,6 +1035,18 @@ document.getElementById('btn-ap').addEventListener('click',()=>{
 
 document.getElementById('btn-warp').addEventListener('click',()=>{
   if(state.phase===PHASE.COAST) state.manualWarp=!state.manualWarp;
+});
+
+function buyFuelWithPoints() {
+  if (state.fuel >= MAX_FUEL) { showBanner('FUEL ALREADY FULL'); return; }
+  if (state.points < FUEL_PURCHASE_COST) { showBanner('NEED MORE POINTS'); return; }
+  state.points -= FUEL_PURCHASE_COST;
+  state.fuel = Math.min(MAX_FUEL, state.fuel + FUEL_PURCHASE_AMOUNT);
+  showBanner('+20 FUEL BOUGHT');
+}
+document.getElementById('btn-fuel').addEventListener('click', buyFuelWithPoints);
+window.addEventListener('keydown', e => {
+  if (e.key.toLowerCase() === 'f') buyFuelWithPoints();
 });
 
 // ── Start / restart ──
