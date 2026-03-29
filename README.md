@@ -87,7 +87,7 @@ The game uses a simplified but feel-good physics model:
 
 | Technology | Role |
 |---|---|
-| [Three.js r160](https://threejs.org) | 3D rendering (loaded from CDN) |
+| [Three.js r160](https://threejs.org) | 3D rendering (bundled locally for offline use) |
 | HTML5 Canvas | Procedural texture generation |
 | Vanilla ES Modules | No build tools, no bundler |
 | CSS3 | Mobile-first HUD + touch controls |
@@ -105,6 +105,16 @@ Tested on:
 - Desktop Chrome/Firefox/Edge
 
 Optimized for portrait **and** landscape. Touch controls auto-show on mobile; keyboard controls work on desktop.
+
+---
+
+## 📥 Offline / Files App (iOS)
+
+You can run the simulator straight from the iOS Files app — no internet required:
+
+1. Download this repo as a ZIP and save it to **On My iPhone** (or iCloud Drive) in Files.
+2. Tap the ZIP to extract it, then open the extracted folder.
+3. Tap `index.html` and choose **Open in Safari** (or long-press → Share → Safari). Three.js is bundled locally (`three.module.js`), so everything runs offline.
 
 ---
 
